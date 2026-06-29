@@ -1279,7 +1279,7 @@ def render_report_en(context: dict) -> str:
 <h2>1. Historical rule: the exclusion bucket has produced zero champions</h2>
 <p><strong>The rule is intentionally narrow.</strong> A team is put in the exclusion bucket only when it played both prior World Cups and, across all knockout or championship-phase appearances in those two tournaments, it neither won the tournament nor lost to that tournament's champion or runner-up. In 1974, 1978, and 1982, the second group stage is treated as a championship phase because those formats did not use a modern round-of-16 bracket.</p>
 <p><strong>The prior-two-participation gate is deliberately strict, so the right comparison is inside that same gate.</strong> Across the 1938-2022 target sample, there are {context['path_team_tournaments_total']} team-tournaments. Only {context['path_prior_both_total']} played both prior World Cups; among those, {context['path_contact_total']} had champion/runner-up path contact and {context['clean_non_contact_teams']} did not.</p>
-<p><strong>The 65 count is team-tournaments, not unique teams.</strong> It is the clean side of a {context['path_contact_total']} vs {context['clean_non_contact_teams']} split among teams that passed the strict prior-participation gate, not a hand-picked list of isolated cases.</p>
+<p><strong>The 65 count is team-tournaments, not unique teams.</strong> It is the clean side of a {context['path_contact_total']} vs {context['clean_non_contact_teams']} split among teams that passed the strict prior-participation gate, not a hand-picked list of isolated cases. If counted more literally, {context['path_lost_to_finalist_total']} of the 177 lost to a champion or runner-up in the prior two tournaments; {context['path_own_champion_total']} had their own prior title; {context['path_contact_overlap_total']} had both, so the union is {context['path_contact_total']}.</p>
 <div class="figure"><img src="{context['fig_history_en']}" alt="Historical path exclusion scope"><div class="caption">Blue tiles show champions that had prior path contact after playing both prior tournaments. Gray tiles show champions outside the rule because they did not play both prior tournaments. There are no red violation tiles.</div></div>
 <p><strong>The apparent exceptions disappear under this stricter definition.</strong> Argentina 1978 did not play the 1970 finals. France 1998 did not play either 1990 or 1994. Italy 1982 did play both prior tournaments, but in 1978 it lost to the eventual runner-up, the Netherlands, during the second group stage.</p>
 {examples_html}
@@ -1389,7 +1389,7 @@ def render_report_zh(context: dict) -> str:
 <h2>1. 历史规则：干净非接触池没有出过冠军</h2>
 <p><strong>这条规则刻意很窄。</strong> 只有当一支球队前两届都参加了世界杯决赛圈，并且这两届所有淘汰赛/争冠阶段经历中，既没有自己夺冠，也没有输给当届冠军或亚军，才进入排除池。1974、1978、1982 的第二阶段小组被视为争冠阶段，因为这些年份不是现代 16 强淘汰赛结构。</p>
 <p><strong>“前两届都参赛”这个门槛确实苛刻，所以要在同一个门槛内对比。</strong> 1938-2022 的目标样本共有 {context['path_team_tournaments_total']} 个球队-届次；其中只有 {context['path_prior_both_total']} 个满足“前两届都参赛”。在这 {context['path_prior_both_total']} 个里面，{context['path_contact_total']} 个有过冠军/亚军路径接触，{context['clean_non_contact_teams']} 个没有。</p>
-<p><strong>65 个不是 65 支唯一球队，而是 65 个球队-届次。</strong> 它是严格参赛门槛之后的“干净无接触”一侧，对照组是同样满足前两届参赛条件、但已经有冠亚军路径接触的 {context['path_contact_total']} 个球队-届次。</p>
+<p><strong>65 个不是 65 支唯一球队，而是 65 个球队-届次。</strong> 它是严格参赛门槛之后的“干净无接触”一侧，对照组是同样满足前两届参赛条件、但已经有冠亚军路径接触的 {context['path_contact_total']} 个球队-届次。更细地拆，严格意义上“前两届输给当届冠军/亚军”的是 {context['path_lost_to_finalist_total']} 个；“前两届自己当过冠军”的是 {context['path_own_champion_total']} 个；两者重叠 {context['path_contact_overlap_total']} 个，所以合并后是 {context['path_contact_total']} 个。</p>
 <div class="figure"><img src="{context['fig_history_zh']}" alt="Historical path exclusion scope"><div class="caption">蓝色代表冠军在前两届都参赛且已有路径接触；灰色代表冠军不适用排除命题，因为前两届没有都参赛。图中没有红色反例。</div></div>
 <p><strong>看似的例外，在这个定义下会消失。</strong> 1978 阿根廷没有参加 1970 决赛圈；1998 法国没有参加 1990 和 1994 决赛圈；1982 意大利虽然前两届都参赛，但 1978 年第二阶段小组输给了最终亚军荷兰。</p>
 {examples_html}
@@ -1489,6 +1489,13 @@ def main() -> None:
     path_team_tournaments_total = int(path_summary["participants"].sum())
     path_prior_both_total = int(path_summary["prior_participated_both_teams"].sum())
     path_contact_total = int(path_summary["path_contact_teams"].sum())
+    prior_both_detail = path_detail[path_detail["prior_participated_both"].eq(1)].copy()
+    contact_reasons = prior_both_detail["contact_reasons"].fillna("")
+    path_lost_to_finalist_total = int(contact_reasons.str.contains("lost to").sum())
+    path_own_champion_total = int(contact_reasons.str.contains("own champion").sum())
+    path_contact_overlap_total = int(
+        (contact_reasons.str.contains("lost to") & contact_reasons.str.contains("own champion")).sum()
+    )
     clean_non_contact_total = int(path_summary["clean_non_contact_teams"].sum())
     clean_non_contact_champions = int(path_summary["clean_non_contact_champions"].sum())
     path_champions_with_prior_both = int(path_summary["champion_prior_participated_both"].sum())
@@ -1515,6 +1522,9 @@ def main() -> None:
         "path_team_tournaments_total": path_team_tournaments_total,
         "path_prior_both_total": path_prior_both_total,
         "path_contact_total": path_contact_total,
+        "path_lost_to_finalist_total": path_lost_to_finalist_total,
+        "path_own_champion_total": path_own_champion_total,
+        "path_contact_overlap_total": path_contact_overlap_total,
         "path_contact_vs_clean": f"{path_contact_total}/{clean_non_contact_total}",
         "clean_non_contact_teams": clean_non_contact_total,
         "clean_non_contact_champions": clean_non_contact_champions,
