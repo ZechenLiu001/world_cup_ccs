@@ -99,11 +99,12 @@ PERFORMANCE_ZH = {
     "not yet known": "待定",
 }
 
-CURATED_POWERHOUSE_TEAMS = {
+CURATED_HISTORICAL_CONTENDERS = {
     "Argentina",
     "Belgium",
     "Brazil",
     "Colombia",
+    "Croatia",
     "England",
     "France",
     "Germany",
@@ -111,6 +112,15 @@ CURATED_POWERHOUSE_TEAMS = {
     "Netherlands",
     "Portugal",
     "Spain",
+    "Uruguay",
+}
+
+CURATED_2026_DOWNGRADE_TEAMS = {
+    "Spain",
+    "Portugal",
+    "Brazil",
+    "Germany",
+    "Colombia",
 }
 
 
@@ -343,18 +353,31 @@ def build_favorite_traps(team_year: pd.DataFrame, rankings: pd.DataFrame) -> pd.
     )
     joined.to_csv(DATA_DERIVED / "ccs_ranked_team_year.csv", index=False)
 
-    traps = joined[(joined["year"].between(1998, 2022)) & (joined["fifa_rank"].le(12) & joined["ccs"].eq(0))]
+    traps = joined[(joined["year"].between(1998, 2022)) & (joined["fifa_rank"].le(20) & joined["ccs"].eq(0))]
     traps = traps.sort_values(["year", "fifa_rank"])[
         ["year", "team_name", "team_code", "fifa_rank", "fifa_points", "ccs", "performance", "ranking_official_date"]
     ]
     traps.to_csv(DATA_DERIVED / "favorite_traps.csv", index=False)
     headliners = traps.groupby("year", as_index=False).head(1).copy()
     headliners.to_csv(DATA_DERIVED / "favorite_trap_headliners.csv", index=False)
-    powerhouses = traps[traps["team_name"].isin(CURATED_POWERHOUSE_TEAMS)].copy()
+    powerhouses = joined[
+        (joined["year"].between(1998, 2022))
+        & (joined["ccs"].eq(0))
+        & (joined["fifa_rank"].le(20))
+        & (joined["team_name"].isin(CURATED_HISTORICAL_CONTENDERS))
+        & ~((joined["year"].eq(1998)) & (joined["team_name"].eq("France")))
+    ].copy()
+    powerhouses = powerhouses.sort_values(["year", "fifa_rank"])[
+        ["year", "team_name", "team_code", "fifa_rank", "fifa_points", "ccs", "performance", "ranking_official_date"]
+    ]
     powerhouses.to_csv(DATA_DERIVED / "favorite_trap_powerhouses.csv", index=False)
 
     watch_2026 = joined[joined["year"].eq(2026)].sort_values("fifa_rank")
     watch_2026.to_csv(DATA_DERIVED / "ccs_2026_watchlist.csv", index=False)
+    downgrade_2026 = watch_2026[
+        watch_2026["ccs"].eq(0) & watch_2026["team_name"].isin(CURATED_2026_DOWNGRADE_TEAMS)
+    ].copy()
+    downgrade_2026.to_csv(DATA_DERIVED / "ccs_2026_downgrade_giants.csv", index=False)
     return joined
 
 
@@ -475,18 +498,19 @@ def chart_favorite_traps(traps: pd.DataFrame, lang: str = "en") -> str:
     top = traps.copy()
     top["label"] = top["year"].astype(str) + " " + top["team_name"].map(lambda x: display_team(x, lang))
     top = top.sort_values(["year", "fifa_rank"])
-    top["strength_score"] = 13 - top["fifa_rank"]
-    fig, ax = plt.subplots(figsize=(11.5, 7.4))
+    max_rank = 20
+    top["strength_score"] = max_rank + 1 - top["fifa_rank"]
+    fig, ax = plt.subplots(figsize=(11.5, 8.6))
     y = np.arange(len(top))
     colors = np.where(top["performance"].str.lower().eq("final"), "#d15532", "#67758a")
     ax.barh(y, top["strength_score"], color=colors)
     ax.set_yticks(y)
     ax.set_yticklabels(top["label"])
     ax.invert_yaxis()
-    ax.set_xticks([1, 3, 5, 7, 9, 11])
-    ax.set_xticklabels(["#12", "#10", "#8", "#6", "#4", "#2"])
+    ax.set_xticks([1, 6, 11, 16, 20])
+    ax.set_xticklabels(["#20", "#15", "#10", "#5", "#1"])
     ax.set_xlabel("赛前 FIFA 排名强度（越靠右越强）" if lang == "zh" else "Pre-tournament FIFA rank strength (farther right is stronger)")
-    ax.set_title("强队/豪门但非 CCS：更有体感的赛前降权清单" if lang == "zh" else "Recognizable contenders, non-CCS: the intuitive pre-kickoff downgrade list")
+    ax.set_title("一众强队/豪门但非 CCS：赛前可降权名单" if lang == "zh" else "A wall of recognizable contenders that CCS would have downgraded")
     ax.grid(axis="x", color="#e8ebf1")
     ax.spines[["top", "right"]].set_visible(False)
     for i, (_, r) in enumerate(top.iterrows()):
@@ -592,9 +616,11 @@ def report_css() -> str:
     """
 
 
-def prepare_tables(context: dict, lang: str) -> tuple[str, str]:
+def prepare_tables(context: dict, lang: str) -> tuple[str, str, str]:
     top_traps = context["trap_powerhouses"].copy()
     top_traps["fifa_rank"] = top_traps["fifa_rank"].map(lambda x: f"#{int(x)}")
+    downgrade_2026 = context["downgrade_2026"].copy()
+    downgrade_2026["fifa_rank"] = downgrade_2026["fifa_rank"].map(lambda x: f"#{int(x)}")
     watch = context["watch_2026"].copy()
     watch = watch[watch["fifa_rank"].le(16)].copy()
     watch["fifa_rank"] = watch["fifa_rank"].map(lambda x: f"#{int(x)}")
@@ -602,6 +628,8 @@ def prepare_tables(context: dict, lang: str) -> tuple[str, str]:
     if lang == "zh":
         top_traps["team_name"] = top_traps["team_name"].map(lambda x: display_team(x, "zh"))
         top_traps["performance"] = top_traps["performance"].map(lambda x: display_performance(x, "zh"))
+        downgrade_2026["team_name"] = downgrade_2026["team_name"].map(lambda x: display_team(x, "zh"))
+        downgrade_2026["降权理由"] = "排名/声望强，但 2018/2022 无 CCS 来源"
         watch["team_name"] = watch["team_name"].map(lambda x: display_team(x, "zh"))
         top_traps = top_traps.rename(columns={"team_name": "球队", "performance": "最终成绩"})
         watch["CCS状态"] = np.where(watch["ccs"].eq(1), "CCS 候选", "非 CCS，需降权")
@@ -609,7 +637,7 @@ def prepare_tables(context: dict, lang: str) -> tuple[str, str]:
             top_traps,
             ["year", "球队", "team_code", "fifa_rank", "最终成绩", "ranking_official_date"],
             {"year": "年份", "team_code": "代码", "fifa_rank": "赛前排名", "ranking_official_date": "排名日期"},
-            18,
+            28,
         )
         watch_html = table_html(
             watch,
@@ -617,14 +645,20 @@ def prepare_tables(context: dict, lang: str) -> tuple[str, str]:
             {"fifa_rank": "排名", "team_name": "球队", "team_code": "代码", "ccs_source_years": "CCS 来源届次"},
             16,
         )
+        downgrade_2026_html = table_html(
+            downgrade_2026,
+            ["fifa_rank", "team_name", "team_code", "fifa_points", "降权理由"],
+            {"fifa_rank": "排名", "team_name": "球队", "team_code": "代码", "fifa_points": "FIFA积分"},
+        )
     else:
         top_traps = top_traps.rename(columns={"team_name": "Team", "performance": "Final outcome"})
+        downgrade_2026["Downgrade reason"] = "Rank/reputation strong, but no CCS source from 2018/2022"
         watch["CCS status"] = np.where(watch["ccs"].eq(1), "CCS candidate", "Non-CCS downgrade")
         traps_html = table_html(
             top_traps,
             ["year", "Team", "team_code", "fifa_rank", "Final outcome", "ranking_official_date"],
             {"year": "Year", "team_code": "Code", "fifa_rank": "FIFA rank", "ranking_official_date": "Ranking date"},
-            18,
+            28,
         )
         watch_html = table_html(
             watch,
@@ -632,12 +666,17 @@ def prepare_tables(context: dict, lang: str) -> tuple[str, str]:
             {"team_name": "Team", "team_code": "Code", "ccs_source_years": "CCS source World Cup"},
             16,
         )
-    return traps_html, watch_html
+        downgrade_2026_html = table_html(
+            downgrade_2026,
+            ["fifa_rank", "team_name", "team_code", "fifa_points", "Downgrade reason"],
+            {"team_name": "Team", "team_code": "Code", "fifa_points": "FIFA points"},
+        )
+    return traps_html, watch_html, downgrade_2026_html
 
 
 def render_report_en(context: dict) -> str:
     css = report_css()
-    traps_html, watch_html = prepare_tables(context, "en")
+    traps_html, watch_html, downgrade_2026_html = prepare_tables(context, "en")
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -656,7 +695,7 @@ def render_report_en(context: dict) -> str:
 <ul>
 <li><strong>CCS is a candidate-pool filter, not a champion picker.</strong> In the 1986-2022 modern knockout era, CCS retained only {context['ccs_pool_share']} of team-tournaments but covered {context['champ_all']} of all champions; after excluding the one no-prior-history case, coverage was {context['champ_evaluable']}.</li>
 <li><strong>The result is not a random one-third screen.</strong> A random candidate pool with each year's same size would expect only {context['random_expected']} champion hits out of 10; the probability of randomly reaching at least 9 hits is {context['random_prob']}.</li>
-<li><strong>The most useful reader experience is the pre-tournament downgrade list.</strong> From 1998 onward, several top-12 FIFA-ranked teams were strong in reputation but non-CCS at kickoff. Many still advanced, including finalists, but none won in the modern sample.</li>
+<li><strong>The most useful reader experience is the pre-tournament downgrade list.</strong> From 1998 onward, a long list of recognizable contenders were highly ranked but non-CCS at kickoff. Many still advanced, including finalists, but none won in the modern sample.</li>
 <li><strong>The mechanism is partly strength, but more specific than strength.</strong> CCS overlaps with elite teams, yet it asks a narrower question: has this team recently been on, or directly removed from, the champion path?</li>
 </ul>
 </section>
@@ -678,13 +717,15 @@ def render_report_en(context: dict) -> str:
 <div class="callout warn"><strong>Interpretation discipline:</strong> this proves CCS beats a no-information random screen. It does not prove CCS beats Elo, betting odds, or a full multivariate model. The next bar is incremental value versus those stronger baselines.</div>
 
 <h2>3. The pre-tournament experience: recognizable favorites CCS would downgrade</h2>
-<p><strong>This is the most intuitive way to use the method.</strong> Before kickoff, a team can be highly ranked, historically recognizable, and still lack a recent champion-chain connection. The main exhibit is curated from the Top-12 non-CCS audit pool to keep the reader experience focused on teams that a modern audience would naturally treat as title-relevant: Argentina, Germany, England, Spain, Portugal, Netherlands, Belgium, and Colombia.</p>
-<div class="figure"><img src="{context['fig_traps_en']}" alt="Recognizable non-CCS title contenders"><div class="caption">Curated from qualified teams that were FIFA Top 12 and non-CCS at kickoff. The broader mechanical Top-12 audit table is retained in data/derived/favorite_traps.csv; the curated list is retained in data/derived/favorite_trap_powerhouses.csv.</div></div>
+<p><strong>This is the most intuitive way to use the method.</strong> Before kickoff, a team can be highly ranked, historically recognizable, and still lack a recent champion-chain connection. The main exhibit is curated from a Top-20 non-CCS audit pool to show the teams a modern audience would naturally treat as title-relevant: Argentina, Germany, England, Spain, Portugal, Netherlands, Belgium, Colombia, Croatia, and Uruguay.</p>
+<div class="figure"><img src="{context['fig_traps_en']}" alt="Recognizable non-CCS title contenders"><div class="caption">Curated from qualified teams that were FIFA Top 20 and non-CCS at kickoff. The full mechanical Top-20 audit table is retained in data/derived/favorite_traps.csv; the curated list is retained in data/derived/favorite_trap_powerhouses.csv.</div></div>
 {traps_html}
 <p><strong>The pattern is useful but not absolute.</strong> Non-CCS strong teams can go deep: 2002 Germany, 2010 Netherlands, and 2014 Argentina reached finals. The historical point is narrower and stronger: in the modern sample, the champion almost always came from the CCS side of the field.</p>
 
 <h2>4. 2026 application: separate rank strength from champion-chain strength</h2>
-<p><strong>The 2026 view is a live-use case, not a backtest result.</strong> The ranking snapshot is frozen at FIFA's June 11, 2026 official ranking and the qualified-team list is from FIFA's 2026 season endpoint. The chart below shows which top-ranked teams have CCS support before using any 2026 knockout results.</p>
+<p><strong>The 2026 view is a live-use case, not a backtest result.</strong> The ranking snapshot is frozen at FIFA's June 11, 2026 official ranking and the qualified-team list is from FIFA's 2026 season endpoint. The headline application is clear: Spain, Portugal, Brazil, Germany, and Colombia are rank-strong, reputation-strong, but non-CCS before kickoff.</p>
+{downgrade_2026_html}
+<p>The broader watchlist below keeps the full top-ranked context visible, so the downgrade call is not hidden inside a hand-picked list.</p>
 <div class="figure"><img src="{context['fig_2026_en']}" alt="2026 ranked watchlist"><div class="caption">Top 24 ranked qualified teams in the 2026 field. Blue teams have CCS support from 2018 or 2022; red teams are rank-strong but non-CCS.</div></div>
 {watch_html}
 
@@ -729,7 +770,7 @@ def render_report_zh(context: dict) -> str:
     """ + report_css() + """
     body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif; }
     """
-    traps_html, watch_html = prepare_tables(context, "zh")
+    traps_html, watch_html, downgrade_2026_html = prepare_tables(context, "zh")
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -748,7 +789,7 @@ def render_report_zh(context: dict) -> str:
 <ul>
 <li><strong>CCS 是冠军候选池过滤器，不是单点冠军预测器。</strong> 在 1986-2022 现代淘汰赛时代，CCS 只保留 {context['ccs_pool_share']} 的球队-届次，却覆盖全部现代冠军中的 {context['champ_all']}；若剔除唯一“前两届无可判定世界杯前史”的法国 1998，则为 {context['champ_evaluable']}。</li>
 <li><strong>这不是随机挑三成球队就能得到的结果。</strong> 若每届随机抽取与 CCS 同等规模的候选池，10 届期望只命中 {context['random_expected']} 个冠军；随机达到至少 9 次命中的概率只有 {context['random_prob']}。</li>
-<li><strong>最有体感的用法，是赛前热门队降权清单。</strong> 1998 年以来，多支 FIFA 排名前 12 的强队在开赛前并非 CCS。它们并不一定弱，甚至可能进决赛，但现代样本里没有最终夺冠。</li>
+<li><strong>最有体感的用法，是赛前热门队降权清单。</strong> 1998 年以来，一众排名高、名气大、今天读者也会认为有冠军叙事的强队，在开赛前并非 CCS。它们并不一定弱，甚至可能进决赛，但现代样本里没有最终夺冠。</li>
 <li><strong>机制上，CCS 有强队效应，但比“强队”更窄。</strong> 它问的不是球队是否有名、排名是否高，而是它最近两届是否已经进入过冠军路径，或被冠军/亚军直接淘汰验证过。</li>
 </ul>
 </section>
@@ -770,13 +811,15 @@ def render_report_zh(context: dict) -> str:
 <div class="callout warn"><strong>解释边界：</strong> 随机基准只能证明 CCS 明显优于无信息随机筛选；它尚不能证明 CCS 优于 Elo、赔率或多变量模型。下一步应检验相对于强基准的增量价值。</div>
 
 <h2>3. 赛前使用体验：哪些强队/豪门应被 CCS 降权</h2>
-<p><strong>这是最容易让读者理解的方法使用场景。</strong> 开赛前，一支球队可以排名很高、历史声望很强、舆论很热，但仍然缺少最近两届的冠军链连接。主图从“FIFA Top 12 且非 CCS”的审计池里人工策展，重点保留今天读者也会自然认为与冠军叙事相关的强队：阿根廷、德国、英格兰、西班牙、葡萄牙、荷兰、比利时、哥伦比亚。</p>
-<div class="figure"><img src="{context['fig_traps_zh']}" alt="Recognizable non-CCS title contenders"><div class="caption">样本来自开赛前 FIFA Top 12 且非 CCS 的入围队；主图展示人工策展的强队/豪门清单。完整机械 Top 12 审计表保留在 data/derived/favorite_traps.csv；策展清单保留在 data/derived/favorite_trap_powerhouses.csv。</div></div>
+<p><strong>这是最容易让读者理解的方法使用场景。</strong> 开赛前，一支球队可以排名很高、历史声望很强、舆论很热，但仍然缺少最近两届的冠军链连接。主图从“FIFA Top 20 且非 CCS”的审计池里人工策展，重点保留今天读者也会自然认为与冠军叙事相关的强队：阿根廷、德国、英格兰、西班牙、葡萄牙、荷兰、比利时、哥伦比亚、克罗地亚、乌拉圭。</p>
+<div class="figure"><img src="{context['fig_traps_zh']}" alt="Recognizable non-CCS title contenders"><div class="caption">样本来自开赛前 FIFA Top 20 且非 CCS 的入围队；主图展示人工策展的强队/豪门清单。完整机械 Top 20 审计表保留在 data/derived/favorite_traps.csv；策展清单保留在 data/derived/favorite_trap_powerhouses.csv。</div></div>
 {traps_html}
 <p><strong>这个信号有用，但不是绝对排除。</strong> 非 CCS 强队可以走很远：2002 德国、2010 荷兰、2014 阿根廷都进入决赛。更准确的结论是：现代样本里，最终冠军几乎总来自 CCS 一侧。</p>
 
 <h2>4. 2026 应用：区分排名强与冠军链强</h2>
-<p><strong>2026 是实时应用场景，不是回测结果。</strong> 本报告将排名快照冻结在 FIFA 2026 年 6 月 11 日官方排名，并使用 FIFA 2026 赛季接口中的入围队名单。下图只展示赛前信息，不使用 2026 淘汰赛结果。</p>
+<p><strong>2026 是实时应用场景，不是回测结果。</strong> 本报告将排名快照冻结在 FIFA 2026 年 6 月 11 日官方排名，并使用 FIFA 2026 赛季接口中的入围队名单。最直接的赛前结论是：西班牙、葡萄牙、巴西、德国、哥伦比亚，都是排名强、声望强，但开赛前非 CCS 的豪强。</p>
+{downgrade_2026_html}
+<p>下方完整观察表保留头部排名上下文，避免把 2026 的降权判断藏在人工挑选名单里。</p>
 <div class="figure"><img src="{context['fig_2026_zh']}" alt="2026 ranked watchlist"><div class="caption">2026 已入围球队中排名前 24 的队伍。蓝色代表 2018 或 2022 提供 CCS 支持；红色代表排名强但非 CCS。</div></div>
 {watch_html}
 
@@ -829,6 +872,7 @@ def main() -> None:
     trap_headliners = pd.read_csv(DATA_DERIVED / "favorite_trap_headliners.csv")
     trap_powerhouses = pd.read_csv(DATA_DERIVED / "favorite_trap_powerhouses.csv")
     watch = pd.read_csv(DATA_DERIVED / "ccs_2026_watchlist.csv")
+    downgrade_2026 = pd.read_csv(DATA_DERIVED / "ccs_2026_downgrade_giants.csv")
 
     total_ccs = modern["ccs"].sum()
     total_participants = modern["participants"].sum()
@@ -856,6 +900,7 @@ def main() -> None:
         "trap_headliners": trap_headliners,
         "trap_powerhouses": trap_powerhouses,
         "watch_2026": watch,
+        "downgrade_2026": downgrade_2026,
     }
 
     report_en = render_report_en(context)

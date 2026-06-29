@@ -47,7 +47,7 @@
 <ul>
 <li><strong>CCS is a candidate-pool filter, not a champion picker.</strong> In the 1986-2022 modern knockout era, CCS retained only 30.1% of team-tournaments but covered 9/10 (90.0%) of all champions; after excluding the one no-prior-history case, coverage was 9/9 (100.0%).</li>
 <li><strong>The result is not a random one-third screen.</strong> A random candidate pool with each year's same size would expect only 3.0 champion hits out of 10; the probability of randomly reaching at least 9 hits is 0.012%.</li>
-<li><strong>The most useful reader experience is the pre-tournament downgrade list.</strong> From 1998 onward, several top-12 FIFA-ranked teams were strong in reputation but non-CCS at kickoff. Many still advanced, including finalists, but none won in the modern sample.</li>
+<li><strong>The most useful reader experience is the pre-tournament downgrade list.</strong> From 1998 onward, a long list of recognizable contenders were highly ranked but non-CCS at kickoff. Many still advanced, including finalists, but none won in the modern sample.</li>
 <li><strong>The mechanism is partly strength, but more specific than strength.</strong> CCS overlaps with elite teams, yet it asks a narrower question: has this team recently been on, or directly removed from, the champion path?</li>
 </ul>
 </section>
@@ -69,8 +69,8 @@
 <div class="callout warn"><strong>Interpretation discipline:</strong> this proves CCS beats a no-information random screen. It does not prove CCS beats Elo, betting odds, or a full multivariate model. The next bar is incremental value versus those stronger baselines.</div>
 
 <h2>3. The pre-tournament experience: recognizable favorites CCS would downgrade</h2>
-<p><strong>This is the most intuitive way to use the method.</strong> Before kickoff, a team can be highly ranked, historically recognizable, and still lack a recent champion-chain connection. The main exhibit is curated from the Top-12 non-CCS audit pool to keep the reader experience focused on teams that a modern audience would naturally treat as title-relevant: Argentina, Germany, England, Spain, Portugal, Netherlands, Belgium, and Colombia.</p>
-<div class="figure"><img src="assets/03_favorite_traps_en.png" alt="Recognizable non-CCS title contenders"><div class="caption">Curated from qualified teams that were FIFA Top 12 and non-CCS at kickoff. The broader mechanical Top-12 audit table is retained in data/derived/favorite_traps.csv; the curated list is retained in data/derived/favorite_trap_powerhouses.csv.</div></div>
+<p><strong>This is the most intuitive way to use the method.</strong> Before kickoff, a team can be highly ranked, historically recognizable, and still lack a recent champion-chain connection. The main exhibit is curated from a Top-20 non-CCS audit pool to show the teams a modern audience would naturally treat as title-relevant: Argentina, Germany, England, Spain, Portugal, Netherlands, Belgium, Colombia, Croatia, and Uruguay.</p>
+<div class="figure"><img src="assets/03_favorite_traps_en.png" alt="Recognizable non-CCS title contenders"><div class="caption">Curated from qualified teams that were FIFA Top 20 and non-CCS at kickoff. The full mechanical Top-20 audit table is retained in data/derived/favorite_traps.csv; the curated list is retained in data/derived/favorite_trap_powerhouses.csv.</div></div>
 <table class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
@@ -89,6 +89,14 @@
       <td>COL</td>
       <td>#10</td>
       <td>group stage</td>
+      <td>1998-05-20</td>
+    </tr>
+    <tr>
+      <td>1998</td>
+      <td>Croatia</td>
+      <td>HRV</td>
+      <td>#19</td>
+      <td>third-place match</td>
       <td>1998-05-20</td>
     </tr>
     <tr>
@@ -164,6 +172,14 @@
       <td>2010-05-26</td>
     </tr>
     <tr>
+      <td>2010</td>
+      <td>Uruguay</td>
+      <td>URY</td>
+      <td>#16</td>
+      <td>third-place match</td>
+      <td>2010-05-26</td>
+    </tr>
+    <tr>
       <td>2014</td>
       <td>Argentina</td>
       <td>ARG</td>
@@ -196,11 +212,35 @@
       <td>2014-06-05</td>
     </tr>
     <tr>
+      <td>2014</td>
+      <td>Croatia</td>
+      <td>HRV</td>
+      <td>#18</td>
+      <td>group stage</td>
+      <td>2014-06-05</td>
+    </tr>
+    <tr>
       <td>2018</td>
       <td>England</td>
       <td>ENG</td>
       <td>#12</td>
       <td>third-place match</td>
+      <td>2018-06-07</td>
+    </tr>
+    <tr>
+      <td>2018</td>
+      <td>Colombia</td>
+      <td>COL</td>
+      <td>#16</td>
+      <td>round of 16</td>
+      <td>2018-06-07</td>
+    </tr>
+    <tr>
+      <td>2018</td>
+      <td>Croatia</td>
+      <td>HRV</td>
+      <td>#20</td>
+      <td>final</td>
       <td>2018-06-07</td>
     </tr>
     <tr>
@@ -224,7 +264,56 @@
 <p><strong>The pattern is useful but not absolute.</strong> Non-CCS strong teams can go deep: 2002 Germany, 2010 Netherlands, and 2014 Argentina reached finals. The historical point is narrower and stronger: in the modern sample, the champion almost always came from the CCS side of the field.</p>
 
 <h2>4. 2026 application: separate rank strength from champion-chain strength</h2>
-<p><strong>The 2026 view is a live-use case, not a backtest result.</strong> The ranking snapshot is frozen at FIFA's June 11, 2026 official ranking and the qualified-team list is from FIFA's 2026 season endpoint. The chart below shows which top-ranked teams have CCS support before using any 2026 knockout results.</p>
+<p><strong>The 2026 view is a live-use case, not a backtest result.</strong> The ranking snapshot is frozen at FIFA's June 11, 2026 official ranking and the qualified-team list is from FIFA's 2026 season endpoint. The headline application is clear: Spain, Portugal, Brazil, Germany, and Colombia are rank-strong, reputation-strong, but non-CCS before kickoff.</p>
+<table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>fifa_rank</th>
+      <th>Team</th>
+      <th>Code</th>
+      <th>FIFA points</th>
+      <th>Downgrade reason</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>#2</td>
+      <td>Spain</td>
+      <td>ESP</td>
+      <td>1874.71</td>
+      <td>Rank/reputation strong, but no CCS source from 2018/2022</td>
+    </tr>
+    <tr>
+      <td>#5</td>
+      <td>Portugal</td>
+      <td>POR</td>
+      <td>1767.85</td>
+      <td>Rank/reputation strong, but no CCS source from 2018/2022</td>
+    </tr>
+    <tr>
+      <td>#6</td>
+      <td>Brazil</td>
+      <td>BRA</td>
+      <td>1765.86</td>
+      <td>Rank/reputation strong, but no CCS source from 2018/2022</td>
+    </tr>
+    <tr>
+      <td>#10</td>
+      <td>Germany</td>
+      <td>GER</td>
+      <td>1735.77</td>
+      <td>Rank/reputation strong, but no CCS source from 2018/2022</td>
+    </tr>
+    <tr>
+      <td>#13</td>
+      <td>Colombia</td>
+      <td>COL</td>
+      <td>1698.35</td>
+      <td>Rank/reputation strong, but no CCS source from 2018/2022</td>
+    </tr>
+  </tbody>
+</table>
+<p>The broader watchlist below keeps the full top-ranked context visible, so the downgrade call is not hidden inside a hand-picked list.</p>
 <div class="figure"><img src="assets/04_2026_watchlist_en.png" alt="2026 ranked watchlist"><div class="caption">Top 24 ranked qualified teams in the 2026 field. Blue teams have CCS support from 2018 or 2022; red teams are rank-strong but non-CCS.</div></div>
 <table class="dataframe data-table">
   <thead>

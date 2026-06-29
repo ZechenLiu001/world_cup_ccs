@@ -40,4 +40,5 @@ The 2026 view uses the June 11, 2026 FIFA ranking as the frozen pre-tournament r
 - Early World Cup formats are retained as context, but the primary empirical claim uses the modern knockout era from 1986 to 2022.
 - The random-candidate benchmark preserves each year's actual CCS candidate-pool size and asks how often a random same-size pool would cover at least 9 of 10 modern champions.
 - FIFA ranking comparisons are used as a strong-team baseline and reader-facing sanity check, not as a full predictive model.
-- The favorite-downgrade exhibit is curated from the Top-12 non-CCS audit pool to focus on recognizable strong teams/title-relevant football brands: Argentina, Germany, England, Spain, Portugal, Netherlands, Belgium, and Colombia. The broader mechanical audit list is retained in `data/derived/favorite_traps.csv`.
+- The favorite-downgrade exhibit is curated from the Top-20 non-CCS audit pool to focus on recognizable strong teams/title-relevant football brands: Argentina, Germany, England, Spain, Portugal, Netherlands, Belgium, Colombia, Croatia, and Uruguay. The broader mechanical audit list is retained in `data/derived/favorite_traps.csv`.
+- The 2026 application separately highlights rank-strong non-CCS title names: Spain, Portugal, Brazil, Germany, and Colombia.
