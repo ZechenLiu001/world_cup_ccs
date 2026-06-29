@@ -1,0 +1,11 @@
+year,participants,ccs,r16_ccs,qf_ccs,sf_ccs,final_ccs,champ_ccs,champion,champion_ccs,notes,r16_total,qf_total,sf_total,final_total,champ_total
+1986,24,5,5,3,3,2,1,Argentina,1,CCS via 1978 champion and 1982 finalists path,16,8,4,2,1
+1990,24,6,6,4,4,2,1,West Germany,1,CCS via 1982 champion/runner-up and 1986 runner-up,16,8,4,2,1
+1994,24,8,7,4,2,2,1,Brazil,1,CCS via 1990 loss to Argentina,16,8,4,2,1
+1998,32,11,8,5,2,1,0,France,0,Exception: France missed both 1990 and 1994 finals,16,8,4,2,1
+2002,32,9,6,3,1,1,1,Brazil,1,CCS via 1998 loss to France,16,8,4,2,1
+2006,32,10,6,5,3,2,1,Italy,1,CCS via 1998 loss to France,16,8,4,2,1
+2010,32,11,8,4,2,1,1,Spain,1,CCS via 2006 loss to France,16,8,4,2,1
+2014,32,9,5,4,3,1,1,Germany,1,CCS via 2006 and 2010 losses to champions,16,8,4,2,1
+2018,32,9,8,4,2,1,1,France,1,CCS via 2014 loss to Germany,16,8,4,2,1
+2022,32,11,7,6,3,2,1,Argentina,1,CCS via 2014/2018 losses to champions,16,8,4,2,1

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>World Cup CCS Investment Report</title>
+<style>
+    :root { --ink:#111827; --muted:#5b6575; --line:#e6eaf0; --blue:#0b5cad; --red:#d15532; --bg:#f6f8fb; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color:var(--ink); background:#fff; line-height:1.55; }
+    .page { max-width: 1080px; margin: 0 auto; padding: 44px 48px 72px; }
+    .eyebrow { color:var(--blue); text-transform: uppercase; letter-spacing:.12em; font-size:12px; font-weight:800; }
+    h1 { font-size: 38px; line-height:1.12; margin: 8px 0 14px; letter-spacing:0; }
+    h2 { font-size: 23px; margin: 42px 0 12px; border-top: 1px solid var(--line); padding-top: 24px; }
+    h3 { font-size: 17px; margin: 24px 0 8px; }
+    p { margin: 0 0 13px; }
+    .subhead { color:var(--muted); font-size:16px; max-width: 880px; }
+    .summary { background:var(--bg); border:1px solid var(--line); padding:22px 24px; margin:28px 0; border-radius:12px; }
+    .summary h2 { border:0; padding:0; margin:0 0 12px; }
+    .summary ul { margin:0; padding-left:20px; }
+    .summary li { margin: 9px 0; }
+    .kpis { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin: 24px 0 30px; }
+    .kpi { border:1px solid var(--line); border-radius:10px; padding:14px 15px; background:#fff; }
+    .kpi .value { font-size:25px; font-weight:800; color:var(--blue); }
+    .kpi .label { color:var(--muted); font-size:12px; margin-top:3px; }
+    .figure { margin: 22px 0 26px; }
+    .figure img { width:100%; border:1px solid var(--line); border-radius:10px; }
+    .caption { color:var(--muted); font-size:12px; margin-top:7px; }
+    .callout { border-left: 4px solid var(--blue); background:#f4f8ff; padding:14px 16px; margin:18px 0; }
+    .warn { border-left-color: var(--red); background:#fff6f2; }
+    .data-table { width:100%; border-collapse: collapse; margin: 16px 0 24px; font-size:13px; }
+    .data-table th { background:#15233a; color:#fff; text-align:left; padding:9px; }
+    .data-table td { border-bottom:1px solid var(--line); padding:8px 9px; vertical-align:top; }
+    .data-table tr:nth-child(even) td { background:#fafbfe; }
+    .footer { color:var(--muted); font-size:12px; margin-top:40px; border-top:1px solid var(--line); padding-top:16px; }
+    @media print { .page { padding: 24px 34px; } .figure img { break-inside: avoid; } h2 { break-after: avoid; } }
+    @page { size: A4; margin: 14mm 12mm; }
+    </style>
+</head>
+<body>
+<main class="page">
+<div class="eyebrow">World Cup predictor research memo</div>
+<h1>Champion-chain signal: a sharper pre-tournament filter than rank alone</h1>
+<p class="subhead">A reproducible backtest of the Champion-Chain Signal (CCS), plus a practical 1998 to 2026 pre-tournament lens for identifying highly ranked teams that deserve a champion-probability downgrade.</p>
+
+<section class="summary">
+<h2>Executive Summary</h2>
+<ul>
+<li><strong>CCS is a candidate-pool filter, not a champion picker.</strong> In the 1986-2022 modern knockout era, CCS retained only 30.1% of team-tournaments but covered 9/10 (90.0%) of all champions; after excluding the one no-prior-history case, coverage was 9/9 (100.0%).</li>
+<li><strong>The result is not a random one-third screen.</strong> A random candidate pool with each year's same size would expect only 3.0 champion hits out of 10; the probability of randomly reaching at least 9 hits is 0.012%.</li>
+<li><strong>The most useful reader experience is the pre-tournament downgrade list.</strong> From 1998 onward, several top-12 FIFA-ranked teams were strong in reputation but non-CCS at kickoff. Many still advanced, including finalists, but none won in the modern sample.</li>
+<li><strong>The mechanism is partly strength, but more specific than strength.</strong> CCS overlaps with elite teams, yet it asks a narrower question: has this team recently been on, or directly removed from, the champion path?</li>
+</ul>
+</section>
+
+<div class="kpis">
+<div class="kpi"><div class="value">9/9 (100.0%)</div><div class="label">Evaluable modern champions covered</div></div>
+<div class="kpi"><div class="value">9/10 (90.0%)</div><div class="label">All modern champions covered</div></div>
+<div class="kpi"><div class="value">30.1%</div><div class="label">Modern candidate-pool share</div></div>
+<div class="kpi"><div class="value">0.012%</div><div class="label">Random same-size pool reaches ≥9/10</div></div>
+</div>
+
+<h2>1. CCS gets more concentrated as the tournament gets serious</h2>
+<p><strong>The primary backtest pattern is monotonic.</strong> CCS teams are about three-tenths of the field, but their share rises at every deeper stage: round of 16, quarter-finals, semi-finals, final, and champion. This makes the signal more useful as a championship filter than as a generic knockout-stage prediction tool.</p>
+<div class="figure"><img src="assets/01_modern_funnel_en.png" alt="CCS modern stage funnel"><div class="caption">Modern era is 1986-2022. Champion coverage is 9/10 on the all-champion denominator and 9/9 after removing France 1998, which had no prior-two-World-Cup finals history.</div></div>
+
+<h2>2. The random benchmark explains why 9/10 matters</h2>
+<p><strong>A same-size random pool is the right first hurdle.</strong> If 1998 has 11 CCS candidates out of 32 teams, the random benchmark also randomly selects 11 of 32. Repeating that across the ten modern tournaments yields an expected 3.0 champion hits, not nine. Hitting at least nine by chance is a 0.012% event.</p>
+<div class="figure"><img src="assets/02_random_benchmark_en.png" alt="Random benchmark chart"><div class="caption">The benchmark preserves each year's candidate-pool size, so it tests information content rather than simply rewarding CCS for selecting more teams.</div></div>
+<div class="callout warn"><strong>Interpretation discipline:</strong> this proves CCS beats a no-information random screen. It does not prove CCS beats Elo, betting odds, or a full multivariate model. The next bar is incremental value versus those stronger baselines.</div>
+
+<h2>3. The pre-tournament experience: headline favorites CCS would downgrade</h2>
+<p><strong>This is the most intuitive way to use the method.</strong> Before kickoff, a team can be highly ranked and still lack a recent champion-chain connection. The main exhibit is intentionally strict: it shows only each tournament's highest-ranked non-CCS team, not the full Top-12 audit list. That keeps the chart focused on teams that were easiest to frame as serious title candidates at the time.</p>
+<div class="figure"><img src="assets/03_favorite_traps_en.png" alt="Highest-ranked non-CCS team by tournament"><div class="caption">For each tournament from 1998-2022, the chart selects the single highest FIFA-ranked qualified team that was non-CCS at kickoff. Red marks teams that still reached the final. The broader Top-12 audit table is retained in data/derived/favorite_traps.csv.</div></div>
+<table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Year</th>
+      <th>Team</th>
+      <th>Code</th>
+      <th>FIFA rank</th>
+      <th>Final outcome</th>
+      <th>Ranking date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1998</td>
+      <td>Mexico</td>
+      <td>MEX</td>
+      <td>#4</td>
+      <td>round of 16</td>
+      <td>1998-05-20</td>
+    </tr>
+    <tr>
+      <td>2002</td>
+      <td>Argentina</td>
+      <td>ARG</td>
+      <td>#3</td>
+      <td>group stage</td>
+      <td>2002-05-15</td>
+    </tr>
+    <tr>
+      <td>2006</td>
+      <td>Czech Republic</td>
+      <td>CZE</td>
+      <td>#2</td>
+      <td>group stage</td>
+      <td>2006-05-17</td>
+    </tr>
+    <tr>
+      <td>2010</td>
+      <td>Netherlands</td>
+      <td>NLD</td>
+      <td>#4</td>
+      <td>final</td>
+      <td>2010-05-26</td>
+    </tr>
+    <tr>
+      <td>2014</td>
+      <td>Argentina</td>
+      <td>ARG</td>
+      <td>#5</td>
+      <td>final</td>
+      <td>2014-06-05</td>
+    </tr>
+    <tr>
+      <td>2018</td>
+      <td>Poland</td>
+      <td>POL</td>
+      <td>#8</td>
+      <td>group stage</td>
+      <td>2018-06-07</td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>Spain</td>
+      <td>ESP</td>
+      <td>#7</td>
+      <td>round of 16</td>
+      <td>2022-10-06</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>The pattern is useful but not absolute.</strong> Non-CCS strong teams can go deep: 2002 Germany, 2010 Netherlands, and 2014 Argentina reached finals. The historical point is narrower and stronger: in the modern sample, the champion almost always came from the CCS side of the field.</p>
+
+<h2>4. 2026 application: separate rank strength from champion-chain strength</h2>
+<p><strong>The 2026 view is a live-use case, not a backtest result.</strong> The ranking snapshot is frozen at FIFA's June 11, 2026 official ranking and the qualified-team list is from FIFA's 2026 season endpoint. The chart below shows which top-ranked teams have CCS support before using any 2026 knockout results.</p>
+<div class="figure"><img src="assets/04_2026_watchlist_en.png" alt="2026 ranked watchlist"><div class="caption">Top 24 ranked qualified teams in the 2026 field. Blue teams have CCS support from 2018 or 2022; red teams are rank-strong but non-CCS.</div></div>
+<table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>fifa_rank</th>
+      <th>Team</th>
+      <th>Code</th>
+      <th>CCS status</th>
+      <th>CCS source World Cup</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>#1</td>
+      <td>Argentina</td>
+      <td>ARG</td>
+      <td>CCS candidate</td>
+      <td>2018;2022</td>
+    </tr>
+    <tr>
+      <td>#2</td>
+      <td>Spain</td>
+      <td>ESP</td>
+      <td>Non-CCS downgrade</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>#3</td>
+      <td>France</td>
+      <td>FRA</td>
+      <td>CCS candidate</td>
+      <td>2018;2022</td>
+    </tr>
+    <tr>
+      <td>#4</td>
+      <td>England</td>
+      <td>ENG</td>
+      <td>CCS candidate</td>
+      <td>2018;2022</td>
+    </tr>
+    <tr>
+      <td>#5</td>
+      <td>Portugal</td>
+      <td>POR</td>
+      <td>Non-CCS downgrade</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>#6</td>
+      <td>Brazil</td>
+      <td>BRA</td>
+      <td>Non-CCS downgrade</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>#7</td>
+      <td>Morocco</td>
+      <td>MAR</td>
+      <td>CCS candidate</td>
+      <td>2022</td>
+    </tr>
+    <tr>
+      <td>#8</td>
+      <td>Netherlands</td>
+      <td>NED</td>
+      <td>CCS candidate</td>
+      <td>2022</td>
+    </tr>
+    <tr>
+      <td>#9</td>
+      <td>Belgium</td>
+      <td>BEL</td>
+      <td>CCS candidate</td>
+      <td>2018</td>
+    </tr>
+    <tr>
+      <td>#10</td>
+      <td>Germany</td>
+      <td>GER</td>
+      <td>Non-CCS downgrade</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>#11</td>
+      <td>Croatia</td>
+      <td>CRO</td>
+      <td>CCS candidate</td>
+      <td>2018;2022</td>
+    </tr>
+    <tr>
+      <td>#13</td>
+      <td>Colombia</td>
+      <td>COL</td>
+      <td>Non-CCS downgrade</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>#14</td>
+      <td>Mexico</td>
+      <td>MEX</td>
+      <td>Non-CCS downgrade</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>#15</td>
+      <td>Senegal</td>
+      <td>SEN</td>
+      <td>Non-CCS downgrade</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>#16</td>
+      <td>Uruguay</td>
+      <td>URU</td>
+      <td>CCS candidate</td>
+      <td>2018</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. Why this happens: strength matters, but path matters too</h2>
+<p><strong>CCS partly captures strength, and that should be acknowledged.</strong> Champions, finalists, and teams beaten by finalists are usually strong teams. A signal built from those events will naturally overlap with FIFA ranking, odds, and historical reputation.</p>
+<p><strong>But CCS is not simply 'teams that often qualify' or 'teams that are highly ranked.'</strong> It requires a specific recent relationship to the champion path: either winning the World Cup or being knocked out by a finalist. A team can be ranked highly, qualify regularly, or have reached a quarter-final and still be non-CCS if it did not touch that path.</p>
+<div class="figure"><img src="assets/05_rank_bucket_control_en.png" alt="Rank bucket control"><div class="caption">FIFA ranking and CCS overlap, especially near the top, but the split inside the top-ranked buckets creates the practical downgrade list.</div></div>
+<p><strong>The proposed mechanism is tournament-cycle validation.</strong> Recent champion-chain contact is a proxy for having already met World Cup knockout intensity against finalist-level opposition. It is not causal proof; it is a compact historical state variable that seems especially relevant for champions rather than finalists.</p>
+
+<h2>Recommended Next Steps</h2>
+<ol>
+<li><strong>Use CCS as the first-layer title filter.</strong> Start the champion pool with CCS candidates, then require extra evidence to re-admit non-CCS teams.</li>
+<li><strong>Add a stronger model benchmark.</strong> Compare CCS against Elo, odds-implied probabilities, FIFA ranking, and a combined model to test incremental value.</li>
+<li><strong>Track 2026 without moving the goalposts.</strong> Freeze the pre-tournament CCS/ranking table and evaluate it only after the tournament is complete.</li>
+</ol>
+
+<h2>Further Questions</h2>
+<ul>
+<li>Does CCS add predictive lift after controlling for Elo or betting odds?</li>
+<li>Is a one-, two-, or three-tournament lookback optimal once tested out of sample?</li>
+<li>Should hosts, major squad-cycle upgrades, and no-prior-history teams receive a separate override flag rather than being treated as ordinary non-CCS teams?</li>
+</ul>
+
+<h2>Caveats And Assumptions</h2>
+<ul>
+<li>The modern champion sample has only 10 observations. The 100% evaluable number is 9/9, not a stable law.</li>
+<li>France 1998 is treated as a no-prior-history exception because it missed the prior two World Cup finals tournaments.</li>
+<li>FIFA ranking is used as a public strong-team proxy; odds and Elo would be better next-step baselines.</li>
+<li>2026 outcomes are not used in the 2026 watchlist. The ranking date is frozen at June 11, 2026.</li>
+</ul>
+
+<div class="footer">
+Generated by scripts/build_report.py. Sources: Fjelstul World Cup Database; FIFA API ranking schedules, rankings, and 2026 qualified-team endpoint. Original corrected CCS report is preserved in reports/pdf/original_ccs_report_corrected.pdf.
+</div>
+</main>
+</body>
+</html>
