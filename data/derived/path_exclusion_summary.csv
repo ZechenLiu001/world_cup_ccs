@@ -1,0 +1,21 @@
+year,champion_name,participants,prior_participated_both_teams,path_contact_teams,clean_non_contact_teams,clean_non_contact_champions,champion_prior_participated_both,champion_path_contact,champion_clean_non_contact,champion_contact_reasons,prior_windows
+1938,Italy,15,4,1,3,0,0,0,0,,1930;1934
+1950,Uruguay,13,4,4,0,0,0,0,0,,1934;1938
+1954,Germany,16,3,3,0,0,0,0,0,,1938;1950
+1958,Brazil,16,4,2,2,0,1,1,0,1954: lost to Hungary (runner-up) in quarter-finals,1950;1954
+1962,Brazil,16,7,4,3,0,1,1,0,1954: lost to Hungary (runner-up) in quarter-finals | 1958: own champion,1954;1958
+1966,England,16,7,5,2,0,1,1,0,1962: lost to Brazil (champion) in quarter-finals,1958;1962
+1970,Brazil,16,8,5,3,0,1,1,0,1962: own champion,1962;1966
+1974,Germany,16,5,4,1,0,1,1,0,1966: lost to England (champion) in final | 1970: lost to Italy (runner-up) in semi-finals,1966;1970
+1978,Argentina,16,4,4,0,0,0,0,0,,1970;1974
+1982,Italy,24,6,5,1,0,1,1,0,1978: lost to Netherlands (runner-up) in second group stage,1974;1978
+1986,Argentina,24,9,7,2,0,1,1,0,1978: own champion | 1982: lost to Italy (champion) in second group stage,1978;1982
+1990,Germany,24,9,7,2,0,1,1,0,1982: lost to Italy (champion) in final | 1986: lost to Argentina (champion) in final,1982;1986
+1994,Brazil,24,7,5,2,0,1,1,0,1990: lost to Argentina (runner-up) in round of 16,1986;1990
+1998,France,32,12,7,5,0,0,0,0,,1990;1994
+2002,Brazil,32,12,5,7,0,1,1,0,1994: own champion | 1998: lost to France (champion) in final,1994;1998
+2006,Italy,32,15,9,6,0,1,1,0,1998: lost to France (champion) in quarter-finals,1998;2002
+2010,Spain,32,13,10,3,0,1,1,0,2006: lost to France (runner-up) in round of 16,2002;2006
+2014,Germany,32,17,8,9,0,1,1,0,2006: lost to Italy (champion) in semi-finals | 2010: lost to Spain (champion) in semi-finals,2006;2010
+2018,France,32,14,8,6,0,1,1,0,2014: lost to Germany (champion) in quarter-finals,2010;2014
+2022,Argentina,32,17,9,8,0,1,1,0,2014: lost to Germany (champion) in final | 2018: lost to France (champion) in round of 16,2014;2018

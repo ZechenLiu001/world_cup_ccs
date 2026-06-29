@@ -1,0 +1,461 @@
+year,team_name,champion,prior_windows,prior_participated_both,path_contact,clean_non_contact,contact_reasons
+1938,Belgium,0,1930;1934,1,0,1,
+1938,Brazil,0,1930;1934,1,0,1,
+1938,Cuba,0,1930;1934,0,0,0,
+1938,Czechoslovakia,0,1930;1934,0,0,0,
+1938,Dutch East Indies,0,1930;1934,0,0,0,
+1938,France,0,1930;1934,1,0,1,
+1938,Germany,0,1930;1934,0,0,0,
+1938,Hungary,0,1930;1934,0,0,0,
+1938,Italy,1,1930;1934,0,0,0,
+1938,Netherlands,0,1930;1934,0,0,0,
+1938,Norway,0,1930;1934,0,0,0,
+1938,Poland,0,1930;1934,0,0,0,
+1938,Romania,0,1930;1934,1,1,0,1934: lost to Czechoslovakia (runner-up) in round of 16
+1938,Sweden,0,1930;1934,0,0,0,
+1938,Switzerland,0,1930;1934,0,0,0,
+1950,Bolivia,0,1934;1938,0,0,0,
+1950,Brazil,0,1934;1938,1,1,0,1938: lost to Italy (champion) in semi-finals
+1950,Chile,0,1934;1938,0,0,0,
+1950,England,0,1934;1938,0,0,0,
+1950,Italy,0,1934;1938,1,1,0,1934: own champion | 1938: own champion
+1950,Mexico,0,1934;1938,0,0,0,
+1950,Paraguay,0,1934;1938,0,0,0,
+1950,Spain,0,1934;1938,0,0,0,
+1950,Sweden,0,1934;1938,1,1,0,1938: lost to Hungary (runner-up) in semi-finals
+1950,Switzerland,0,1934;1938,1,1,0,1934: lost to Czechoslovakia (runner-up) in quarter-finals | 1938: lost to Hungary (runner-up) in quarter-finals
+1950,USA,0,1934;1938,0,0,0,
+1950,Uruguay,1,1934;1938,0,0,0,
+1950,Yugoslavia,0,1934;1938,0,0,0,
+1954,Austria,0,1938;1950,0,0,0,
+1954,Belgium,0,1938;1950,0,0,0,
+1954,Brazil,0,1938;1950,1,1,0,1938: lost to Italy (champion) in semi-finals
+1954,Czechoslovakia,0,1938;1950,0,0,0,
+1954,England,0,1938;1950,0,0,0,
+1954,France,0,1938;1950,0,0,0,
+1954,Germany,1,1938;1950,0,0,0,
+1954,Hungary,0,1938;1950,0,0,0,
+1954,Italy,0,1938;1950,1,1,0,1938: own champion
+1954,Mexico,0,1938;1950,0,0,0,
+1954,Scotland,0,1938;1950,0,0,0,
+1954,South Korea,0,1938;1950,0,0,0,
+1954,Switzerland,0,1938;1950,1,1,0,1938: lost to Hungary (runner-up) in quarter-finals
+1954,Turkey,0,1938;1950,0,0,0,
+1954,Uruguay,0,1938;1950,0,0,0,
+1954,Yugoslavia,0,1938;1950,0,0,0,
+1958,Argentina,0,1950;1954,0,0,0,
+1958,Austria,0,1950;1954,0,0,0,
+1958,Brazil,1,1950;1954,1,1,0,1954: lost to Hungary (runner-up) in quarter-finals
+1958,Czechoslovakia,0,1950;1954,0,0,0,
+1958,England,0,1950;1954,1,0,1,
+1958,France,0,1950;1954,0,0,0,
+1958,Germany,0,1950;1954,0,0,0,
+1958,Hungary,0,1950;1954,0,0,0,
+1958,Mexico,0,1950;1954,1,0,1,
+1958,Northern Ireland,0,1950;1954,0,0,0,
+1958,Paraguay,0,1950;1954,0,0,0,
+1958,Scotland,0,1950;1954,0,0,0,
+1958,Soviet Union,0,1950;1954,0,0,0,
+1958,Sweden,0,1950;1954,0,0,0,
+1958,Wales,0,1950;1954,0,0,0,
+1958,Yugoslavia,0,1950;1954,1,1,0,1954: lost to Germany (champion) in quarter-finals
+1962,Argentina,0,1954;1958,0,0,0,
+1962,Brazil,1,1954;1958,1,1,0,1954: lost to Hungary (runner-up) in quarter-finals | 1958: own champion
+1962,Bulgaria,0,1954;1958,0,0,0,
+1962,Chile,0,1954;1958,0,0,0,
+1962,Colombia,0,1954;1958,0,0,0,
+1962,Czechoslovakia,0,1954;1958,1,0,1,
+1962,England,0,1954;1958,1,0,1,
+1962,Germany,0,1954;1958,1,1,0,1954: own champion | 1958: lost to Sweden (runner-up) in semi-finals
+1962,Hungary,0,1954;1958,1,1,0,1954: lost to Germany (champion) in final
+1962,Italy,0,1954;1958,0,0,0,
+1962,Mexico,0,1954;1958,1,0,1,
+1962,Soviet Union,0,1954;1958,0,0,0,
+1962,Spain,0,1954;1958,0,0,0,
+1962,Switzerland,0,1954;1958,0,0,0,
+1962,Uruguay,0,1954;1958,0,0,0,
+1962,Yugoslavia,0,1954;1958,1,1,0,1954: lost to Germany (champion) in quarter-finals
+1966,Argentina,0,1958;1962,1,0,1,
+1966,Brazil,0,1958;1962,1,1,0,1958: own champion | 1962: own champion
+1966,Bulgaria,0,1958;1962,0,0,0,
+1966,Chile,0,1958;1962,0,0,0,
+1966,England,1,1958;1962,1,1,0,1962: lost to Brazil (champion) in quarter-finals
+1966,France,0,1958;1962,0,0,0,
+1966,Germany,0,1958;1962,1,1,0,1958: lost to Sweden (runner-up) in semi-finals
+1966,Hungary,0,1958;1962,1,1,0,1962: lost to Czechoslovakia (runner-up) in quarter-finals
+1966,Italy,0,1958;1962,0,0,0,
+1966,Mexico,0,1958;1962,1,0,1,
+1966,North Korea,0,1958;1962,0,0,0,
+1966,Portugal,0,1958;1962,0,0,0,
+1966,Soviet Union,0,1958;1962,1,1,0,1958: lost to Sweden (runner-up) in quarter-finals
+1966,Spain,0,1958;1962,0,0,0,
+1966,Switzerland,0,1958;1962,0,0,0,
+1966,Uruguay,0,1958;1962,0,0,0,
+1970,Belgium,0,1962;1966,0,0,0,
+1970,Brazil,1,1962;1966,1,1,0,1962: own champion
+1970,Bulgaria,0,1962;1966,1,0,1,
+1970,Czechoslovakia,0,1962;1966,0,0,0,
+1970,El Salvador,0,1962;1966,0,0,0,
+1970,England,0,1962;1966,1,1,0,1962: lost to Brazil (champion) in quarter-finals | 1966: own champion
+1970,Germany,0,1962;1966,1,1,0,1966: lost to England (champion) in final
+1970,Israel,0,1962;1966,0,0,0,
+1970,Italy,0,1962;1966,1,0,1,
+1970,Mexico,0,1962;1966,1,0,1,
+1970,Morocco,0,1962;1966,0,0,0,
+1970,Peru,0,1962;1966,0,0,0,
+1970,Romania,0,1962;1966,0,0,0,
+1970,Soviet Union,0,1962;1966,1,1,0,1966: lost to Germany (runner-up) in semi-finals
+1970,Sweden,0,1962;1966,0,0,0,
+1970,Uruguay,0,1962;1966,1,1,0,1966: lost to Germany (runner-up) in quarter-finals
+1974,Argentina,0,1966;1970,0,0,0,
+1974,Australia,0,1966;1970,0,0,0,
+1974,Brazil,0,1966;1970,1,1,0,1970: own champion
+1974,Bulgaria,0,1966;1970,1,0,1,
+1974,Chile,0,1966;1970,0,0,0,
+1974,East Germany,0,1966;1970,0,0,0,
+1974,Germany,1,1966;1970,1,1,0,1966: lost to England (champion) in final | 1970: lost to Italy (runner-up) in semi-finals
+1974,Haiti,0,1966;1970,0,0,0,
+1974,Italy,0,1966;1970,1,1,0,1970: lost to Brazil (champion) in final
+1974,Netherlands,0,1966;1970,0,0,0,
+1974,Poland,0,1966;1970,0,0,0,
+1974,Scotland,0,1966;1970,0,0,0,
+1974,Sweden,0,1966;1970,0,0,0,
+1974,Uruguay,0,1966;1970,1,1,0,1966: lost to Germany (runner-up) in quarter-finals | 1970: lost to Brazil (champion) in semi-finals
+1974,Yugoslavia,0,1966;1970,0,0,0,
+1974,Zaire,0,1966;1970,0,0,0,
+1978,Argentina,1,1970;1974,0,0,0,
+1978,Austria,0,1970;1974,0,0,0,
+1978,Brazil,0,1970;1974,1,1,0,1970: own champion | 1974: lost to Netherlands (runner-up) in second group stage
+1978,France,0,1970;1974,0,0,0,
+1978,Germany,0,1970;1974,1,1,0,1970: lost to Italy (runner-up) in semi-finals | 1974: own champion
+1978,Hungary,0,1970;1974,0,0,0,
+1978,Iran,0,1970;1974,0,0,0,
+1978,Italy,0,1970;1974,1,1,0,1970: lost to Brazil (champion) in final
+1978,Mexico,0,1970;1974,0,0,0,
+1978,Netherlands,0,1970;1974,0,0,0,
+1978,Peru,0,1970;1974,0,0,0,
+1978,Poland,0,1970;1974,0,0,0,
+1978,Scotland,0,1970;1974,0,0,0,
+1978,Spain,0,1970;1974,0,0,0,
+1978,Sweden,0,1970;1974,1,1,0,1974: lost to Germany (champion) in second group stage
+1978,Tunisia,0,1970;1974,0,0,0,
+1982,Algeria,0,1974;1978,0,0,0,
+1982,Argentina,0,1974;1978,1,1,0,1974: lost to Netherlands (runner-up) in second group stage | 1978: own champion
+1982,Austria,0,1974;1978,0,0,0,
+1982,Belgium,0,1974;1978,0,0,0,
+1982,Brazil,0,1974;1978,1,1,0,1974: lost to Netherlands (runner-up) in second group stage
+1982,Cameroon,0,1974;1978,0,0,0,
+1982,Chile,0,1974;1978,0,0,0,
+1982,Czechoslovakia,0,1974;1978,0,0,0,
+1982,El Salvador,0,1974;1978,0,0,0,
+1982,England,0,1974;1978,0,0,0,
+1982,France,0,1974;1978,0,0,0,
+1982,Germany,0,1974;1978,1,1,0,1974: own champion
+1982,Honduras,0,1974;1978,0,0,0,
+1982,Hungary,0,1974;1978,0,0,0,
+1982,Italy,1,1974;1978,1,1,0,1978: lost to Netherlands (runner-up) in second group stage
+1982,Kuwait,0,1974;1978,0,0,0,
+1982,New Zealand,0,1974;1978,0,0,0,
+1982,Northern Ireland,0,1974;1978,0,0,0,
+1982,Peru,0,1974;1978,0,0,0,
+1982,Poland,0,1974;1978,1,1,0,1974: lost to Germany (champion) in second group stage | 1978: lost to Argentina (champion) in second group stage
+1982,Scotland,0,1974;1978,1,0,1,
+1982,Soviet Union,0,1974;1978,0,0,0,
+1982,Spain,0,1974;1978,0,0,0,
+1982,Yugoslavia,0,1974;1978,0,0,0,
+1986,Algeria,0,1978;1982,0,0,0,
+1986,Argentina,1,1978;1982,1,1,0,1978: own champion | 1982: lost to Italy (champion) in second group stage
+1986,Belgium,0,1978;1982,0,0,0,
+1986,Brazil,0,1978;1982,1,1,0,1982: lost to Italy (champion) in second group stage
+1986,Bulgaria,0,1978;1982,0,0,0,
+1986,Canada,0,1978;1982,0,0,0,
+1986,Denmark,0,1978;1982,0,0,0,
+1986,England,0,1978;1982,0,0,0,
+1986,France,0,1978;1982,1,1,0,1982: lost to Germany (runner-up) in semi-finals
+1986,Germany,0,1978;1982,1,1,0,1982: lost to Italy (champion) in final
+1986,Hungary,0,1978;1982,1,0,1,
+1986,Iraq,0,1978;1982,0,0,0,
+1986,Italy,0,1978;1982,1,1,0,1978: lost to Netherlands (runner-up) in second group stage | 1982: own champion
+1986,Mexico,0,1978;1982,0,0,0,
+1986,Morocco,0,1978;1982,0,0,0,
+1986,Northern Ireland,0,1978;1982,0,0,0,
+1986,Paraguay,0,1978;1982,0,0,0,
+1986,Poland,0,1978;1982,1,1,0,1978: lost to Argentina (champion) in second group stage | 1982: lost to Italy (champion) in semi-finals
+1986,Portugal,0,1978;1982,0,0,0,
+1986,Scotland,0,1978;1982,1,0,1,
+1986,South Korea,0,1978;1982,0,0,0,
+1986,Soviet Union,0,1978;1982,0,0,0,
+1986,Spain,0,1978;1982,1,1,0,1982: lost to Germany (runner-up) in second group stage
+1986,Uruguay,0,1978;1982,0,0,0,
+1990,Argentina,0,1982;1986,1,1,0,1982: lost to Italy (champion) in second group stage | 1986: own champion
+1990,Austria,0,1982;1986,0,0,0,
+1990,Belgium,0,1982;1986,1,1,0,1986: lost to Argentina (champion) in semi-finals
+1990,Brazil,0,1982;1986,1,1,0,1982: lost to Italy (champion) in second group stage
+1990,Cameroon,0,1982;1986,0,0,0,
+1990,Colombia,0,1982;1986,0,0,0,
+1990,Costa Rica,0,1982;1986,0,0,0,
+1990,Czechoslovakia,0,1982;1986,0,0,0,
+1990,Egypt,0,1982;1986,0,0,0,
+1990,England,0,1982;1986,1,1,0,1986: lost to Argentina (champion) in quarter-finals
+1990,Germany,1,1982;1986,1,1,0,1982: lost to Italy (champion) in final | 1986: lost to Argentina (champion) in final
+1990,Italy,0,1982;1986,1,1,0,1982: own champion
+1990,Netherlands,0,1982;1986,0,0,0,
+1990,Republic of Ireland,0,1982;1986,0,0,0,
+1990,Romania,0,1982;1986,0,0,0,
+1990,Scotland,0,1982;1986,1,0,1,
+1990,South Korea,0,1982;1986,0,0,0,
+1990,Soviet Union,0,1982;1986,1,0,1,
+1990,Spain,0,1982;1986,1,1,0,1982: lost to Germany (runner-up) in second group stage
+1990,Sweden,0,1982;1986,0,0,0,
+1990,USA,0,1982;1986,0,0,0,
+1990,United Arab Emirates,0,1982;1986,0,0,0,
+1990,Uruguay,0,1982;1986,0,0,0,
+1990,Yugoslavia,0,1982;1986,0,0,0,
+1994,Argentina,0,1986;1990,1,1,0,1986: own champion | 1990: lost to Germany (champion) in final
+1994,Belgium,0,1986;1990,1,1,0,1986: lost to Argentina (champion) in semi-finals
+1994,Bolivia,0,1986;1990,0,0,0,
+1994,Brazil,1,1986;1990,1,1,0,1990: lost to Argentina (runner-up) in round of 16
+1994,Bulgaria,0,1986;1990,0,0,0,
+1994,Cameroon,0,1986;1990,0,0,0,
+1994,Colombia,0,1986;1990,0,0,0,
+1994,Germany,0,1986;1990,1,1,0,1986: lost to Argentina (champion) in final | 1990: own champion
+1994,Greece,0,1986;1990,0,0,0,
+1994,Italy,0,1986;1990,1,1,0,1990: lost to Argentina (runner-up) in semi-finals
+1994,Mexico,0,1986;1990,0,0,0,
+1994,Morocco,0,1986;1990,0,0,0,
+1994,Netherlands,0,1986;1990,0,0,0,
+1994,Nigeria,0,1986;1990,0,0,0,
+1994,Norway,0,1986;1990,0,0,0,
+1994,Republic of Ireland,0,1986;1990,0,0,0,
+1994,Romania,0,1986;1990,0,0,0,
+1994,Russia,0,1986;1990,0,0,0,
+1994,Saudi Arabia,0,1986;1990,0,0,0,
+1994,South Korea,0,1986;1990,1,0,1,
+1994,Spain,0,1986;1990,1,0,1,
+1994,Sweden,0,1986;1990,0,0,0,
+1994,Switzerland,0,1986;1990,0,0,0,
+1994,USA,0,1986;1990,0,0,0,
+1998,Argentina,0,1990;1994,1,1,0,1990: lost to Germany (champion) in final
+1998,Austria,0,1990;1994,0,0,0,
+1998,Belgium,0,1990;1994,1,0,1,
+1998,Brazil,0,1990;1994,1,1,0,1990: lost to Argentina (runner-up) in round of 16 | 1994: own champion
+1998,Bulgaria,0,1990;1994,0,0,0,
+1998,Cameroon,0,1990;1994,1,0,1,
+1998,Chile,0,1990;1994,0,0,0,
+1998,Colombia,0,1990;1994,1,0,1,
+1998,Croatia,0,1990;1994,0,0,0,
+1998,Denmark,0,1990;1994,0,0,0,
+1998,England,0,1990;1994,0,0,0,
+1998,France,1,1990;1994,0,0,0,
+1998,Germany,0,1990;1994,1,1,0,1990: own champion
+1998,Iran,0,1990;1994,0,0,0,
+1998,Italy,0,1990;1994,1,1,0,1990: lost to Argentina (runner-up) in semi-finals | 1994: lost to Brazil (champion) in final
+1998,Jamaica,0,1990;1994,0,0,0,
+1998,Japan,0,1990;1994,0,0,0,
+1998,Mexico,0,1990;1994,0,0,0,
+1998,Morocco,0,1990;1994,0,0,0,
+1998,Netherlands,0,1990;1994,1,1,0,1990: lost to Germany (champion) in round of 16 | 1994: lost to Brazil (champion) in quarter-finals
+1998,Nigeria,0,1990;1994,0,0,0,
+1998,Norway,0,1990;1994,0,0,0,
+1998,Paraguay,0,1990;1994,0,0,0,
+1998,Romania,0,1990;1994,1,0,1,
+1998,Saudi Arabia,0,1990;1994,0,0,0,
+1998,Scotland,0,1990;1994,0,0,0,
+1998,South Africa,0,1990;1994,0,0,0,
+1998,South Korea,0,1990;1994,1,0,1,
+1998,Spain,0,1990;1994,1,1,0,1994: lost to Italy (runner-up) in quarter-finals
+1998,Tunisia,0,1990;1994,0,0,0,
+1998,USA,0,1990;1994,1,1,0,1994: lost to Brazil (champion) in round of 16
+1998,Yugoslavia,0,1990;1994,0,0,0,
+2002,Argentina,0,1994;1998,1,0,1,
+2002,Belgium,0,1994;1998,1,0,1,
+2002,Brazil,1,1994;1998,1,1,0,1994: own champion | 1998: lost to France (champion) in final
+2002,Cameroon,0,1994;1998,1,0,1,
+2002,China,0,1994;1998,0,0,0,
+2002,Costa Rica,0,1994;1998,0,0,0,
+2002,Croatia,0,1994;1998,0,0,0,
+2002,Denmark,0,1994;1998,0,0,0,
+2002,Ecuador,0,1994;1998,0,0,0,
+2002,England,0,1994;1998,0,0,0,
+2002,France,0,1994;1998,0,0,0,
+2002,Germany,0,1994;1998,1,0,1,
+2002,Italy,0,1994;1998,1,1,0,1994: lost to Brazil (champion) in final | 1998: lost to France (champion) in quarter-finals
+2002,Japan,0,1994;1998,0,0,0,
+2002,Mexico,0,1994;1998,1,0,1,
+2002,Nigeria,0,1994;1998,1,1,0,1994: lost to Italy (runner-up) in round of 16
+2002,Paraguay,0,1994;1998,0,0,0,
+2002,Poland,0,1994;1998,0,0,0,
+2002,Portugal,0,1994;1998,0,0,0,
+2002,Republic of Ireland,0,1994;1998,0,0,0,
+2002,Russia,0,1994;1998,0,0,0,
+2002,Saudi Arabia,0,1994;1998,1,0,1,
+2002,Senegal,0,1994;1998,0,0,0,
+2002,Slovenia,0,1994;1998,0,0,0,
+2002,South Africa,0,1994;1998,0,0,0,
+2002,South Korea,0,1994;1998,1,0,1,
+2002,Spain,0,1994;1998,1,1,0,1994: lost to Italy (runner-up) in quarter-finals
+2002,Sweden,0,1994;1998,0,0,0,
+2002,Tunisia,0,1994;1998,0,0,0,
+2002,Turkey,0,1994;1998,0,0,0,
+2002,USA,0,1994;1998,1,1,0,1994: lost to Brazil (champion) in round of 16
+2002,Uruguay,0,1994;1998,0,0,0,
+2006,Angola,0,1998;2002,0,0,0,
+2006,Argentina,0,1998;2002,1,0,1,
+2006,Australia,0,1998;2002,0,0,0,
+2006,Brazil,0,1998;2002,1,1,0,1998: lost to France (champion) in final | 2002: own champion
+2006,Costa Rica,0,1998;2002,0,0,0,
+2006,Croatia,0,1998;2002,1,1,0,1998: lost to France (champion) in semi-finals
+2006,Czech Republic,0,1998;2002,0,0,0,
+2006,Ecuador,0,1998;2002,0,0,0,
+2006,England,0,1998;2002,1,1,0,2002: lost to Brazil (champion) in quarter-finals
+2006,France,0,1998;2002,1,1,0,1998: own champion
+2006,Germany,0,1998;2002,1,1,0,2002: lost to Brazil (champion) in final
+2006,Ghana,0,1998;2002,0,0,0,
+2006,Iran,0,1998;2002,0,0,0,
+2006,Italy,1,1998;2002,1,1,0,1998: lost to France (champion) in quarter-finals
+2006,Ivory Coast,0,1998;2002,0,0,0,
+2006,Japan,0,1998;2002,1,0,1,
+2006,Mexico,0,1998;2002,1,0,1,
+2006,Netherlands,0,1998;2002,0,0,0,
+2006,Paraguay,0,1998;2002,1,1,0,1998: lost to France (champion) in round of 16 | 2002: lost to Germany (runner-up) in round of 16
+2006,Poland,0,1998;2002,0,0,0,
+2006,Portugal,0,1998;2002,0,0,0,
+2006,Saudi Arabia,0,1998;2002,1,0,1,
+2006,Serbia and Montenegro,0,1998;2002,0,0,0,
+2006,South Korea,0,1998;2002,1,1,0,2002: lost to Germany (runner-up) in semi-finals
+2006,Spain,0,1998;2002,1,0,1,
+2006,Sweden,0,1998;2002,0,0,0,
+2006,Switzerland,0,1998;2002,0,0,0,
+2006,Togo,0,1998;2002,0,0,0,
+2006,Trinidad and Tobago,0,1998;2002,0,0,0,
+2006,Tunisia,0,1998;2002,1,0,1,
+2006,USA,0,1998;2002,1,1,0,2002: lost to Germany (runner-up) in quarter-finals
+2006,Ukraine,0,1998;2002,0,0,0,
+2010,Algeria,0,2002;2006,0,0,0,
+2010,Argentina,0,2002;2006,1,0,1,
+2010,Australia,0,2002;2006,0,0,0,
+2010,Brazil,0,2002;2006,1,1,0,2002: own champion | 2006: lost to France (runner-up) in quarter-finals
+2010,Cameroon,0,2002;2006,0,0,0,
+2010,Chile,0,2002;2006,0,0,0,
+2010,Denmark,0,2002;2006,0,0,0,
+2010,England,0,2002;2006,1,1,0,2002: lost to Brazil (champion) in quarter-finals
+2010,France,0,2002;2006,1,1,0,2006: lost to Italy (champion) in final
+2010,Germany,0,2002;2006,1,1,0,2002: lost to Brazil (champion) in final | 2006: lost to Italy (champion) in semi-finals
+2010,Ghana,0,2002;2006,0,0,0,
+2010,Greece,0,2002;2006,0,0,0,
+2010,Honduras,0,2002;2006,0,0,0,
+2010,Italy,0,2002;2006,1,1,0,2006: own champion
+2010,Ivory Coast,0,2002;2006,0,0,0,
+2010,Japan,0,2002;2006,1,0,1,
+2010,Mexico,0,2002;2006,1,0,1,
+2010,Netherlands,0,2002;2006,0,0,0,
+2010,New Zealand,0,2002;2006,0,0,0,
+2010,Nigeria,0,2002;2006,0,0,0,
+2010,North Korea,0,2002;2006,0,0,0,
+2010,Paraguay,0,2002;2006,1,1,0,2002: lost to Germany (runner-up) in round of 16
+2010,Portugal,0,2002;2006,1,1,0,2006: lost to France (runner-up) in semi-finals
+2010,Serbia,0,2002;2006,0,0,0,
+2010,Slovakia,0,2002;2006,0,0,0,
+2010,Slovenia,0,2002;2006,0,0,0,
+2010,South Africa,0,2002;2006,0,0,0,
+2010,South Korea,0,2002;2006,1,1,0,2002: lost to Germany (runner-up) in semi-finals
+2010,Spain,1,2002;2006,1,1,0,2006: lost to France (runner-up) in round of 16
+2010,Switzerland,0,2002;2006,0,0,0,
+2010,USA,0,2002;2006,1,1,0,2002: lost to Germany (runner-up) in quarter-finals
+2010,Uruguay,0,2002;2006,0,0,0,
+2014,Algeria,0,2006;2010,0,0,0,
+2014,Argentina,0,2006;2010,1,0,1,
+2014,Australia,0,2006;2010,1,1,0,2006: lost to Italy (champion) in round of 16
+2014,Belgium,0,2006;2010,0,0,0,
+2014,Bosnia and Herzegovina,0,2006;2010,0,0,0,
+2014,Brazil,0,2006;2010,1,1,0,2006: lost to France (runner-up) in quarter-finals | 2010: lost to Netherlands (runner-up) in quarter-finals
+2014,Cameroon,0,2006;2010,0,0,0,
+2014,Chile,0,2006;2010,0,0,0,
+2014,Colombia,0,2006;2010,0,0,0,
+2014,Costa Rica,0,2006;2010,0,0,0,
+2014,Croatia,0,2006;2010,0,0,0,
+2014,Ecuador,0,2006;2010,0,0,0,
+2014,England,0,2006;2010,1,0,1,
+2014,France,0,2006;2010,1,1,0,2006: lost to Italy (champion) in final
+2014,Germany,1,2006;2010,1,1,0,2006: lost to Italy (champion) in semi-finals | 2010: lost to Spain (champion) in semi-finals
+2014,Ghana,0,2006;2010,1,0,1,
+2014,Greece,0,2006;2010,0,0,0,
+2014,Honduras,0,2006;2010,0,0,0,
+2014,Iran,0,2006;2010,0,0,0,
+2014,Italy,0,2006;2010,1,1,0,2006: own champion
+2014,Ivory Coast,0,2006;2010,1,0,1,
+2014,Japan,0,2006;2010,1,0,1,
+2014,Mexico,0,2006;2010,1,0,1,
+2014,Netherlands,0,2006;2010,1,1,0,2010: lost to Spain (champion) in final
+2014,Nigeria,0,2006;2010,0,0,0,
+2014,Portugal,0,2006;2010,1,1,0,2006: lost to France (runner-up) in semi-finals | 2010: lost to Spain (champion) in round of 16
+2014,Russia,0,2006;2010,0,0,0,
+2014,South Korea,0,2006;2010,1,0,1,
+2014,Spain,0,2006;2010,1,1,0,2006: lost to France (runner-up) in round of 16 | 2010: own champion
+2014,Switzerland,0,2006;2010,1,0,1,
+2014,USA,0,2006;2010,1,0,1,
+2014,Uruguay,0,2006;2010,0,0,0,
+2018,Argentina,0,2010;2014,1,1,0,2014: lost to Germany (champion) in final
+2018,Australia,0,2010;2014,1,0,1,
+2018,Belgium,0,2010;2014,0,0,0,
+2018,Brazil,0,2010;2014,1,1,0,2010: lost to Netherlands (runner-up) in quarter-finals | 2014: lost to Germany (champion) in semi-finals
+2018,Colombia,0,2010;2014,0,0,0,
+2018,Costa Rica,0,2010;2014,0,0,0,
+2018,Croatia,0,2010;2014,0,0,0,
+2018,Denmark,0,2010;2014,0,0,0,
+2018,Egypt,0,2010;2014,0,0,0,
+2018,England,0,2010;2014,1,0,1,
+2018,France,1,2010;2014,1,1,0,2014: lost to Germany (champion) in quarter-finals
+2018,Germany,0,2010;2014,1,1,0,2010: lost to Spain (champion) in semi-finals | 2014: own champion
+2018,Iceland,0,2010;2014,0,0,0,
+2018,Iran,0,2010;2014,0,0,0,
+2018,Japan,0,2010;2014,1,0,1,
+2018,Mexico,0,2010;2014,1,0,1,
+2018,Morocco,0,2010;2014,0,0,0,
+2018,Nigeria,0,2010;2014,1,0,1,
+2018,Panama,0,2010;2014,0,0,0,
+2018,Peru,0,2010;2014,0,0,0,
+2018,Poland,0,2010;2014,0,0,0,
+2018,Portugal,0,2010;2014,1,1,0,2010: lost to Spain (champion) in round of 16
+2018,Russia,0,2010;2014,0,0,0,
+2018,Saudi Arabia,0,2010;2014,0,0,0,
+2018,Senegal,0,2010;2014,0,0,0,
+2018,Serbia,0,2010;2014,0,0,0,
+2018,South Korea,0,2010;2014,1,0,1,
+2018,Spain,0,2010;2014,1,1,0,2010: own champion
+2018,Sweden,0,2010;2014,0,0,0,
+2018,Switzerland,0,2010;2014,1,1,0,2014: lost to Argentina (runner-up) in round of 16
+2018,Tunisia,0,2010;2014,0,0,0,
+2018,Uruguay,0,2010;2014,1,1,0,2010: lost to Netherlands (runner-up) in semi-finals
+2022,Argentina,1,2014;2018,1,1,0,2014: lost to Germany (champion) in final | 2018: lost to France (champion) in round of 16
+2022,Australia,0,2014;2018,1,0,1,
+2022,Belgium,0,2014;2018,1,1,0,2014: lost to Argentina (runner-up) in quarter-finals | 2018: lost to France (champion) in semi-finals
+2022,Brazil,0,2014;2018,1,1,0,2014: lost to Germany (champion) in semi-finals
+2022,Cameroon,0,2014;2018,0,0,0,
+2022,Canada,0,2014;2018,0,0,0,
+2022,Costa Rica,0,2014;2018,1,0,1,
+2022,Croatia,0,2014;2018,1,1,0,2018: lost to France (champion) in final
+2022,Denmark,0,2014;2018,0,0,0,
+2022,Ecuador,0,2014;2018,0,0,0,
+2022,England,0,2014;2018,1,1,0,2018: lost to Croatia (runner-up) in semi-finals
+2022,France,0,2014;2018,1,1,0,2014: lost to Germany (champion) in quarter-finals | 2018: own champion
+2022,Germany,0,2014;2018,1,1,0,2014: own champion
+2022,Ghana,0,2014;2018,0,0,0,
+2022,Iran,0,2014;2018,1,0,1,
+2022,Japan,0,2014;2018,1,0,1,
+2022,Mexico,0,2014;2018,1,0,1,
+2022,Morocco,0,2014;2018,0,0,0,
+2022,Netherlands,0,2014;2018,0,0,0,
+2022,Poland,0,2014;2018,0,0,0,
+2022,Portugal,0,2014;2018,1,0,1,
+2022,Qatar,0,2014;2018,0,0,0,
+2022,Saudi Arabia,0,2014;2018,0,0,0,
+2022,Senegal,0,2014;2018,0,0,0,
+2022,Serbia,0,2014;2018,0,0,0,
+2022,South Korea,0,2014;2018,1,0,1,
+2022,Spain,0,2014;2018,1,0,1,
+2022,Switzerland,0,2014;2018,1,1,0,2014: lost to Argentina (runner-up) in round of 16
+2022,Tunisia,0,2014;2018,0,0,0,
+2022,USA,0,2014;2018,0,0,0,
+2022,Uruguay,0,2014;2018,1,1,0,2018: lost to France (champion) in quarter-finals
+2022,Wales,0,2014;2018,0,0,0,

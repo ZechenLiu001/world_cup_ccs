@@ -18,6 +18,7 @@ from pathlib import Path
 
 import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch, Rectangle
 import numpy as np
 import pandas as pd
 
@@ -86,6 +87,7 @@ TEAM_ZH = {
     "Ecuador": "厄瓜多尔",
     "Austria": "奥地利",
     "Iran": "伊朗",
+    "Italy": "意大利",
     "Uruguay": "乌拉圭",
     "USA": "美国",
 }
@@ -329,11 +331,249 @@ def random_benchmark(modern_summary: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def random_benchmark_from_summary(summary: pd.DataFrame, output_name: str) -> pd.DataFrame:
+    sample = summary[summary["evaluable"].eq(1)].copy()
+    probs = (sample["ccs_candidates"] / sample["participants"]).tolist()
+    actual_hits = int(sample["champ_ccs"].sum())
+    dist = poisson_binomial_distribution(probs)
+    out = sample[
+        ["year", "participants", "ccs_candidates", "random_hit_probability", "champion", "champ_ccs"]
+    ].copy()
+    out["expected_random_hits"] = sum(probs)
+    out["actual_hits"] = actual_hits
+    out["prob_random_ge_actual"] = float(dist[actual_hits:].sum())
+    out.to_csv(DATA_DERIVED / output_name, index=False)
+    return out
+
+
 def poisson_binomial_distribution(probs: list[float]) -> np.ndarray:
     dist = np.array([1.0])
     for p in probs:
         dist = np.convolve(dist, np.array([1 - p, p]))
     return dist
+
+
+def build_historical_knockout_backtest() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    qualified = read_csv_url("qualified_teams")
+    matches = read_csv_url("matches")
+    standings = read_csv_url("tournament_standings")
+
+    qualified = qualified[qualified["tournament_name"].str.contains("Men's World Cup", regex=False)].copy()
+    matches = matches[matches["tournament_name"].str.contains("Men's World Cup", regex=False)].copy()
+    standings = standings[standings["tournament_name"].str.contains("Men's World Cup", regex=False)].copy()
+    for frame in [qualified, matches, standings]:
+        frame["year"] = frame["tournament_id"].map(extract_year)
+    qualified["team_name"] = qualified["team_name"].map(norm_team)
+    standings["team_name"] = standings["team_name"].map(norm_team)
+
+    chains = chain_sets(matches, standings)
+    knockout_years = sorted(
+        int(year)
+        for year in standings["year"].unique()
+        if int(((matches["year"].eq(year)) & matches["knockout_stage"].eq(1)).sum()) > 0
+    )
+    all_years = sorted(int(year) for year in standings["year"].unique())
+
+    scope_rows = []
+    for year in all_years:
+        ko_matches = int(((matches["year"].eq(year)) & matches["knockout_stage"].eq(1)).sum())
+        if year == 1950:
+            note = "final-round-robin; no knockout-stage path"
+        elif year in {1974, 1978, 1982}:
+            note = "hybrid format; knockout path exists but is shorter than modern bracket"
+        elif ko_matches:
+            note = "knockout path available"
+        else:
+            note = "no knockout path"
+        scope_rows.append(
+            {
+                "year": year,
+                "participants": int((qualified["year"].eq(year)).sum()),
+                "knockout_matches": ko_matches,
+                "has_knockout_path": int(ko_matches > 0),
+                "included_in_historical_backtest": int(ko_matches > 0),
+                "format_note": note,
+            }
+        )
+
+    summary_rows = []
+    team_rows = []
+    for year in knockout_years:
+        teams = qualified[qualified["year"].eq(year)][["year", "team_name", "team_code", "performance"]].copy()
+        prior_years = [prior for prior in knockout_years if prior < year][-2:]
+        prior_chain = set()
+        for prior in prior_years:
+            prior_chain |= chains.get(prior, set())
+        champion = standings.loc[
+            standings["year"].eq(year) & standings["position"].eq(1), "team_name"
+        ].iloc[0]
+        teams["ccs"] = teams["team_name"].isin(prior_chain).astype(int)
+        teams["ccs_source_years"] = teams["team_name"].map(
+            lambda team: ";".join(str(prior) for prior in prior_years if team in chains.get(prior, set()))
+        )
+        teams["prior_windows"] = ";".join(map(str, prior_years))
+        teams["source"] = "Fjelstul qualified_teams.csv; prior two knockout-path World Cups"
+        teams["evaluable"] = int(len(prior_years) == 2)
+        team_rows.append(teams)
+        ccs_candidates = int(teams["ccs"].sum())
+        participants = int(len(teams))
+        champ_ccs = int(champion in set(teams.loc[teams["ccs"].eq(1), "team_name"]))
+        summary_rows.append(
+            {
+                "year": year,
+                "champion": champion,
+                "participants": participants,
+                "ccs_candidates": ccs_candidates,
+                "ccs_share": ccs_candidates / participants if participants else np.nan,
+                "random_hit_probability": ccs_candidates / participants if participants else np.nan,
+                "champ_ccs": champ_ccs,
+                "evaluable": int(len(prior_years) == 2),
+                "prior_windows": ";".join(map(str, prior_years)),
+                "champion_prior_ccs_sources": ";".join(
+                    str(prior) for prior in prior_years if champion in chains.get(prior, set())
+                ),
+            }
+        )
+
+    team_year = pd.concat(team_rows, ignore_index=True)
+    summary = pd.DataFrame(summary_rows)
+    scope = pd.DataFrame(scope_rows)
+    team_year.to_csv(DATA_DERIVED / "historical_knockout_team_year.csv", index=False)
+    summary.to_csv(DATA_DERIVED / "historical_knockout_summary.csv", index=False)
+    scope.to_csv(DATA_DERIVED / "world_cup_format_scope.csv", index=False)
+    return team_year, summary, scope
+
+
+def path_contact_reason(team: str, year: int, matches: pd.DataFrame, standings: pd.DataFrame) -> tuple[bool, str]:
+    year_standings = standings[standings["year"].eq(year)]
+    champion = year_standings.loc[year_standings["position"].eq(1), "team_name"].iloc[0]
+    finalists = set(year_standings.loc[year_standings["position"].isin([1, 2]), "team_name"])
+    if team == champion:
+        return True, "own champion"
+
+    stage_mask = matches["knockout_stage"].eq(1) | matches["stage_name"].eq("second group stage")
+    rows = matches[
+        matches["year"].eq(year)
+        & stage_mask
+        & ((matches["home_team_name"].eq(team)) | (matches["away_team_name"].eq(team)))
+    ]
+    reasons = []
+    for _, match in rows.iterrows():
+        home = norm_team(match["home_team_name"])
+        away = norm_team(match["away_team_name"])
+        if match["result"] == "home team win":
+            winner, loser = home, away
+        elif match["result"] == "away team win":
+            winner, loser = away, home
+        else:
+            continue
+        if loser == team and winner in finalists:
+            role = "champion" if winner == champion else "runner-up"
+            reasons.append(f"{year}: lost to {winner} ({role}) in {match['stage_name']}")
+    return bool(reasons), "; ".join(reasons)
+
+
+def build_path_exclusion_backtest() -> tuple[pd.DataFrame, pd.DataFrame]:
+    qualified = read_csv_url("qualified_teams")
+    matches = read_csv_url("matches")
+    standings = read_csv_url("tournament_standings")
+
+    qualified = qualified[qualified["tournament_name"].str.contains("Men's World Cup", regex=False)].copy()
+    matches = matches[matches["tournament_name"].str.contains("Men's World Cup", regex=False)].copy()
+    standings = standings[standings["tournament_name"].str.contains("Men's World Cup", regex=False)].copy()
+    for frame in [qualified, matches, standings]:
+        frame["year"] = frame["tournament_id"].map(extract_year)
+    qualified["team_name"] = qualified["team_name"].map(norm_team)
+    matches["home_team_name"] = matches["home_team_name"].map(norm_team)
+    matches["away_team_name"] = matches["away_team_name"].map(norm_team)
+    standings["team_name"] = standings["team_name"].map(norm_team)
+
+    years = sorted(int(year) for year in standings["year"].unique())
+    champion_by_year = {
+        year: standings.loc[standings["year"].eq(year) & standings["position"].eq(1), "team_name"].iloc[0]
+        for year in years
+    }
+
+    detail_rows = []
+    summary_rows = []
+    for idx, year in enumerate(years):
+        if idx < 2:
+            continue
+        prior_years = years[idx - 2 : idx]
+        target_teams = qualified[qualified["year"].eq(year)].copy()
+        champion = champion_by_year[year]
+        for team in sorted(target_teams["team_name"].unique()):
+            prior_participation = [
+                not qualified[qualified["year"].eq(prior) & qualified["team_name"].eq(team)].empty
+                for prior in prior_years
+            ]
+            contact_notes = []
+            if all(prior_participation):
+                for prior in prior_years:
+                    has_contact, reason = path_contact_reason(team, prior, matches, standings)
+                    if has_contact:
+                        contact_notes.append(f"{prior}: {reason}" if reason == "own champion" else reason)
+            has_path_contact = bool(contact_notes)
+            clean_non_contact = bool(all(prior_participation) and not has_path_contact)
+            detail_rows.append(
+                {
+                    "year": year,
+                    "team_name": team,
+                    "champion": int(team == champion),
+                    "prior_windows": ";".join(map(str, prior_years)),
+                    "prior_participated_both": int(all(prior_participation)),
+                    "path_contact": int(has_path_contact),
+                    "clean_non_contact": int(clean_non_contact),
+                    "contact_reasons": " | ".join(contact_notes),
+                }
+            )
+
+        year_detail = pd.DataFrame([row for row in detail_rows if row["year"] == year])
+        champion_row = year_detail[year_detail["champion"].eq(1)].iloc[0]
+        summary_rows.append(
+            {
+                "year": year,
+                "champion_name": champion,
+                "participants": int(len(target_teams)),
+                "prior_participated_both_teams": int(year_detail["prior_participated_both"].sum()),
+                "path_contact_teams": int(
+                    (year_detail["prior_participated_both"].eq(1) & year_detail["path_contact"].eq(1)).sum()
+                ),
+                "clean_non_contact_teams": int(year_detail["clean_non_contact"].sum()),
+                "clean_non_contact_champions": int(
+                    (year_detail["clean_non_contact"].eq(1) & year_detail["champion"].eq(1)).sum()
+                ),
+                "champion_prior_participated_both": int(champion_row["prior_participated_both"]),
+                "champion_path_contact": int(champion_row["path_contact"]),
+                "champion_clean_non_contact": int(champion_row["clean_non_contact"]),
+                "champion_contact_reasons": champion_row["contact_reasons"],
+                "prior_windows": champion_row["prior_windows"],
+            }
+        )
+
+    detail = pd.DataFrame(detail_rows)
+    summary = pd.DataFrame(summary_rows)
+    detail.to_csv(DATA_DERIVED / "path_exclusion_team_year.csv", index=False)
+    summary.to_csv(DATA_DERIVED / "path_exclusion_summary.csv", index=False)
+    return detail, summary
+
+
+def exclusion_random_benchmark(path_summary: pd.DataFrame) -> pd.DataFrame:
+    out = path_summary[
+        ["year", "participants", "clean_non_contact_teams", "clean_non_contact_champions"]
+    ].copy()
+    out["random_exclusion_probability"] = out["clean_non_contact_teams"] / out["participants"]
+    out["random_keep_champion_probability"] = 1 - out["random_exclusion_probability"]
+    out["expected_random_excluded_champions"] = out["random_exclusion_probability"].sum()
+    out["prob_random_zero_excluded_champions_exact"] = out["random_keep_champion_probability"].prod()
+
+    rng = np.random.default_rng(20260611)
+    probs = out["random_exclusion_probability"].to_numpy()
+    simulated_exclusions = (rng.random((200_000, len(probs))) < probs).sum(axis=1)
+    out["simulation_runs"] = 200_000
+    out["prob_random_zero_excluded_champions_simulated"] = float((simulated_exclusions == 0).mean())
+    out.to_csv(DATA_DERIVED / "path_exclusion_random_benchmark.csv", index=False)
+    return out
 
 
 def contender_permutation_benchmark(joined: pd.DataFrame, modern_summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -528,23 +768,115 @@ def chart_modern_funnel(modern: pd.DataFrame, lang: str = "en") -> str:
     return savefig(f"01_modern_funnel_{lang}.png")
 
 
-def chart_random_benchmark(random_df: pd.DataFrame, lang: str = "en") -> str:
-    ccs_hits = int(random_df["ccs_hit"].sum())
-    exp_hits = float(random_df["random_hit_probability"].sum())
-    prob_ge9 = float(random_df["prob_random_ge_9_of_10"].iloc[0])
-    labels = ["CCS actual", "Random same-size pool\nexpected", "Random chance of\n≥9 hits"]
+def chart_historical_scope(summary: pd.DataFrame, scope: pd.DataFrame, lang: str = "en") -> str:
+    fig, ax = plt.subplots(figsize=(12.2, 6.0))
+    ax.set_xlim(0, 7)
+    ax.set_ylim(0, 4.55)
+    ax.axis("off")
+
+    title = (
+        "No champion comes from the clean non-contact bucket"
+        if lang == "en"
+        else "历史上没有冠军来自“干净非接触”排除池"
+    )
+    subtitle = (
+        "If a team played both prior World Cups but had no champion/runner-up path contact, it has never won the next one."
+        if lang == "en"
+        else "若前两届都参赛，却没有任何冠军/亚军路径接触，历史上从未在下一届夺冠。"
+    )
+    ax.text(0, 4.42, title, fontsize=19, fontweight="bold", va="top")
+    ax.text(0, 4.05, subtitle, fontsize=11, color="#5b6575", va="top")
+
+    summary_by_year = summary.set_index("year").to_dict("index")
+    scope_by_year = scope.set_index("year").to_dict("index")
+    years = sorted(scope["year"].tolist())
+    cols = 6
+    tile_w, tile_h = 1.02, 0.63
+    x_gap, y_gap = 0.13, 0.16
+    start_y = 3.22
+    for idx, year in enumerate(years):
+        col = idx % cols
+        row = idx // cols
+        x = col * (tile_w + x_gap)
+        y = start_y - row * (tile_h + y_gap)
+        scope_row = scope_by_year[year]
+        rec = summary_by_year.get(year)
+        if rec is None:
+            face, edge, status = "#eef3fa", "#b7c6da", "warm-up"
+            label = "前史不足" if lang == "zh" else "setup"
+            champion = ""
+        elif int(rec["champion_clean_non_contact"]) == 1:
+            face, edge, status = "#fff1ec", "#d15532", "violation"
+            label = "反例" if lang == "zh" else "violation"
+            champion = display_team(rec["champion_name"], lang)
+        elif int(rec["champion_prior_participated_both"]) == 0:
+            face, edge, status = "#f3f4f6", "#cfd6e1", "outside rule"
+            label = "前两届未全参赛" if lang == "zh" else "not 2-for-2"
+            champion = display_team(rec["champion_name"], lang)
+        elif int(rec["champion_path_contact"]) == 1:
+            face, edge, status = "#e8f2fb", "#0b5cad", "hit"
+            label = "路径接触" if lang == "zh" else "path contact"
+            champion = display_team(rec["champion_name"], lang)
+        else:
+            face, edge, status = "#fff8e5", "#c58a00", "review"
+            label = "需复核" if lang == "zh" else "review"
+            champion = display_team(rec["champion_name"], lang)
+        ax.add_patch(
+            FancyBboxPatch(
+                (x, y),
+                tile_w,
+                tile_h,
+                boxstyle="round,pad=0.015,rounding_size=0.045",
+                linewidth=1.5,
+                edgecolor=edge,
+                facecolor=face,
+            )
+        )
+        ax.text(x + 0.08, y + tile_h - 0.12, str(year), fontsize=12, fontweight="bold", va="top")
+        ax.text(x + 0.08, y + 0.28, champion, fontsize=10.5, va="center", color="#172033")
+        ax.text(x + 0.08, y + 0.10, label, fontsize=8.5, va="bottom", color="#5b6575")
+
+    clean_total = int(summary["clean_non_contact_teams"].sum())
+    contact_total = int(summary["path_contact_teams"].sum())
+    clean_champions = int(summary["clean_non_contact_champions"].sum())
+    tested = summary[summary["champion_prior_participated_both"].eq(1)]
+    protected = int(tested["champion_path_contact"].sum())
+    total = int(len(tested))
+    note = (
+        f"Prior-two participation split: {contact_total} with path contact vs {clean_total} clean non-contact; clean non-contact champions: {clean_champions}/{clean_total}."
+        if lang == "en"
+        else f"前两届都参赛样本：{contact_total} 个有路径接触 vs {clean_total} 个干净非接触；后者冠军：{clean_champions}/{clean_total}。"
+    )
+    ax.text(0, 0.18, note, fontsize=12, fontweight="bold", color="#172033")
+    return savefig(f"01_historical_scope_{lang}.png")
+
+
+def chart_random_benchmark(path_summary: pd.DataFrame, lang: str = "en") -> str:
+    clean_total = int(path_summary["clean_non_contact_teams"].sum())
+    actual_excluded_champions = int(path_summary["clean_non_contact_champions"].sum())
+    random_expected = float((path_summary["clean_non_contact_teams"] / path_summary["participants"]).sum())
+    random_zero_prob = float(np.prod(1 - path_summary["clean_non_contact_teams"] / path_summary["participants"]))
+    labels = ["Actual rule\nclean non-contact", "Random same-size\nexclusion pool"]
     if lang == "zh":
-        labels = ["CCS 实际命中", "同规模随机池\n期望命中", "随机达到\n≥9次命中"]
-    vals = [ccs_hits, exp_hits, prob_ge9 * 10]
-    fig, ax = plt.subplots(figsize=(10.5, 5.5))
-    colors = ["#0b5cad", "#9aa6b2", "#d15532"]
-    bars = ax.bar(labels, vals, color=colors, width=0.55)
-    ax.set_ylim(0, 10)
-    ax.set_ylabel("10届冠军命中次数\n（第三柱为概率缩放展示）" if lang == "zh" else "Champion hits out of 10\n(third bar scaled to 10)")
-    ax.set_title("CCS 的 9/10 命中不是随机三成筛选能轻易做到的" if lang == "zh" else "CCS coverage is not what random one-third screening would produce")
+        labels = ["真实规则\n干净非接触池", "同规模随机\n排除池"]
+
+    fig, ax = plt.subplots(figsize=(10.8, 5.4))
+    x = np.arange(2)
+    bars = ax.bar(x, [actual_excluded_champions, random_expected], color=["#0b5cad", "#b2bbc8"], width=0.52)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_ylim(0, max(3.5, random_expected + 1))
+    ax.set_ylabel("Champions inside exclusion bucket" if lang == "en" else "排除池中的冠军数")
+    ax.set_title(
+        "The exclusion rule avoids every champion; random same-size exclusion usually would not"
+        if lang == "en"
+        else "排除规则没有排掉任何冠军；同规模随机排除通常做不到"
+    )
     ax.grid(axis="y", color="#e8ebf1")
     ax.spines[["top", "right"]].set_visible(False)
-    annotations = [f"{ccs_hits}/10", f"{exp_hits:.1f}/10", f"{prob_ge9:.3%} probability"]
+    annotations = [f"0/{clean_total}", f"{random_expected:.1f} expected"]
+    if lang == "zh":
+        annotations = [f"0/{clean_total}", f"期望 {random_expected:.1f}"]
     for bar, label in zip(bars, annotations):
         ax.annotate(
             label,
@@ -552,74 +884,118 @@ def chart_random_benchmark(random_df: pd.DataFrame, lang: str = "en") -> str:
             xytext=(0, 8),
             textcoords="offset points",
             ha="center",
-            fontsize=11,
+            fontsize=12,
             fontweight="bold",
         )
-    ax.text(
-        2,
-        1.15,
-        "红色柱为概率值，缩放后仅用于可视化。" if lang == "zh" else "The red bar is a probability, scaled only so it remains visible.",
-        ha="center",
-        fontsize=9,
-        color="#5b6575",
+    note = (
+        f"Random chance of excluding zero champions with the same yearly pool sizes: {random_zero_prob:.1%}"
+        if lang == "en"
+        else f"按每届同样规模随机排除，却 0 次排到冠军的概率：{random_zero_prob:.1%}"
     )
+    ax.text(0.5, 0.34, note, ha="center", fontsize=11, color="#d15532", fontweight="bold")
     return savefig(f"02_random_benchmark_{lang}.png")
 
 
+def performance_rank(value: str) -> int:
+    order = {
+        "final": 5,
+        "third-place match": 4,
+        "quarter-finals": 3,
+        "round of 16": 2,
+        "group stage": 1,
+        "not yet known": 0,
+    }
+    return order.get(str(value), 0)
+
+
 def chart_favorite_traps(traps: pd.DataFrame, lang: str = "en") -> str:
-    top = traps.copy()
-    top["label"] = top["year"].astype(str) + " " + top["team_name"].map(lambda x: display_team(x, lang))
-    top = top.sort_values(["year", "fifa_rank"])
-    fig, ax = plt.subplots(figsize=(11.5, 8.6))
-    y = np.arange(len(top))
-    colors = np.where(top["performance"].str.lower().eq("final"), "#d15532", "#67758a")
-    ax.barh(y, np.ones(len(top)), color=colors)
-    ax.set_yticks(y)
-    ax.set_yticklabels(top["label"])
-    ax.invert_yaxis()
-    ax.set_xlim(0, 1.28)
-    ax.set_xticks([])
-    ax.set_title("一众强队/豪门但非 CCS：赛前可降权名单" if lang == "zh" else "A wall of recognizable contenders that CCS would have downgraded")
-    ax.spines[["top", "right", "bottom"]].set_visible(False)
-    for i, (_, r) in enumerate(top.iterrows()):
-        ax.text(
-            1.02,
-            i,
-            f"#{int(r['fifa_rank'])} · {display_performance(r['performance'], lang)}",
-            va="center",
-            fontsize=10,
+    grouped_rows = []
+    for year, rows in traps.sort_values(["year", "fifa_rank"]).groupby("year"):
+        names = [display_team(name, lang) for name in rows["team_name"].tolist()]
+        best = rows.sort_values("performance", key=lambda s: s.map(performance_rank), ascending=False).iloc[0]
+        grouped_rows.append(
+            {
+                "year": int(year),
+                "teams": "  ·  ".join(names),
+                "count": len(rows),
+                "best": f"{display_team(best['team_name'], lang)} · {display_performance(best['performance'], lang)}",
+            }
         )
+
+    fig, ax = plt.subplots(figsize=(12.4, 7.2))
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, len(grouped_rows) + 1.25)
+    ax.axis("off")
+    title = (
+        "Recognizable contenders CCS would have downgraded before kickoff"
+        if lang == "en"
+        else "赛前会被 CCS 降权的一众强队/豪门"
+    )
+    subtitle = (
+        "Curated from FIFA Top-20 non-CCS teams, keeping only sides with a plausible title narrative."
+        if lang == "en"
+        else "从 FIFA Top 20 且非 CCS 的审计池中筛出：只保留有冠军叙事的强队/豪门。"
+    )
+    ax.text(0.0, len(grouped_rows) + 1.02, title, fontsize=19, fontweight="bold", va="top")
+    ax.text(0.0, len(grouped_rows) + 0.63, subtitle, fontsize=11, color="#5b6575", va="top")
+    ax.text(0.02, len(grouped_rows) + 0.10, "Year" if lang == "en" else "年份", fontsize=10, color="#5b6575", fontweight="bold")
+    ax.text(0.18, len(grouped_rows) + 0.10, "Non-CCS heavyweights" if lang == "en" else "非 CCS 豪强", fontsize=10, color="#5b6575", fontweight="bold")
+    ax.text(0.73, len(grouped_rows) + 0.10, "Deepest run" if lang == "en" else "最深成绩", fontsize=10, color="#5b6575", fontweight="bold")
+
+    for idx, row in enumerate(grouped_rows):
+        y = len(grouped_rows) - idx - 0.55
+        face = "#f8fafc" if idx % 2 == 0 else "#ffffff"
+        ax.add_patch(Rectangle((0, y - 0.34), 1, 0.62, facecolor=face, edgecolor="#e6eaf0", linewidth=0.8))
+        ax.text(0.02, y, str(row["year"]), fontsize=15, fontweight="bold", va="center", color="#0b5cad")
+        ax.text(0.18, y, row["teams"], fontsize=12.2, va="center", color="#172033")
+        ax.text(0.73, y, row["best"], fontsize=11.2, va="center", color="#d15532", fontweight="bold")
+        count_text = f"{row['count']} teams" if lang == "en" else f"{row['count']} 队"
+        ax.text(0.95, y, count_text, fontsize=10, va="center", ha="right", color="#5b6575")
     return savefig(f"03_favorite_traps_{lang}.png")
 
 
-def chart_2026_watchlist(watch: pd.DataFrame, lang: str = "en") -> str:
-    top = watch[watch["fifa_rank"].le(24)].copy().sort_values("fifa_rank")
-    fig, ax = plt.subplots(figsize=(11.5, 7.2))
-    y = np.arange(len(top))
-    colors = np.where(top["ccs"].eq(1), "#0b5cad", "#d15532")
-    ax.barh(y, np.ones(len(top)), color=colors)
-    ax.set_yticks(y)
-    ax.set_yticklabels([f"#{int(r.fifa_rank)} {display_team(r.team_name, lang)}" for r in top.itertuples()])
-    ax.invert_yaxis()
-    ax.set_xlim(0, 1.18)
-    ax.set_xticks([])
-    ax.set_title("2026 赛前观察：哪些强队缺少 CCS 支持" if lang == "zh" else "2026 pre-tournament watchlist: which contenders lack CCS support")
-    ax.spines[["top", "right", "bottom"]].set_visible(False)
-    for i, r in enumerate(top.itertuples()):
-        status = "CCS" if r.ccs else ("非CCS" if lang == "zh" else "Non-CCS")
-        ax.text(1.02, i, status, va="center", fontsize=9, fontweight="bold")
-    from matplotlib.patches import Patch
-
-    ax.legend(
-        handles=[
-            Patch(color="#0b5cad", label="CCS 候选" if lang == "zh" else "CCS candidate"),
-            Patch(color="#d15532", label="排名强但非 CCS" if lang == "zh" else "Ranked strong, non-CCS"),
-        ],
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.02),
-        ncol=2,
-        frameon=False,
+def chart_2026_watchlist(downgrade: pd.DataFrame, lang: str = "en") -> str:
+    cards = downgrade.sort_values("fifa_rank").copy()
+    fig, ax = plt.subplots(figsize=(12.4, 4.45))
+    ax.set_xlim(0, 5)
+    ax.set_ylim(0, 1.75)
+    ax.axis("off")
+    title = (
+        "2026: big-name contenders outside the champion-chain pool"
+        if lang == "en"
+        else "2026：冠军链候选池之外的响当当强队"
     )
+    subtitle = (
+        "These are not weak teams. CCS says they need extra evidence to be re-admitted as title picks."
+        if lang == "en"
+        else "这不是说它们弱，而是说若要押冠军，需要额外证据把它们重新放回候选池。"
+    )
+    ax.text(0, 1.68, title, fontsize=19, fontweight="bold", va="top")
+    ax.text(0, 1.43, subtitle, fontsize=11, color="#5b6575", va="top")
+    for idx, r in enumerate(cards.itertuples()):
+        x = idx
+        y = 0.13
+        ax.add_patch(
+            FancyBboxPatch(
+                (x + 0.08, y),
+                0.84,
+                1.08,
+                boxstyle="round,pad=0.02,rounding_size=0.06",
+                linewidth=1.4,
+                edgecolor="#d15532",
+                facecolor="#fff4ef",
+            )
+        )
+        ax.text(x + 0.18, y + 0.88, f"#{int(r.fifa_rank)}", fontsize=14, fontweight="bold", color="#d15532")
+        ax.text(x + 0.18, y + 0.58, display_team(r.team_name, lang), fontsize=17, fontweight="bold", color="#172033")
+        ax.text(
+            x + 0.18,
+            y + 0.27,
+            "Non-CCS" if lang == "en" else "非 CCS",
+            fontsize=11,
+            color="#5b6575",
+            fontweight="bold",
+        )
     return savefig(f"04_2026_watchlist_{lang}.png")
 
 
@@ -784,9 +1160,90 @@ def prepare_tables(context: dict, lang: str) -> tuple[str, str, str]:
     return traps_html, watch_html, downgrade_2026_html
 
 
+def historical_misses_html(summary: pd.DataFrame, lang: str) -> str:
+    misses = summary[(summary["evaluable"].eq(1)) & (summary["champ_ccs"].eq(0))].copy()
+    misses["champion_display"] = misses["champion"].map(lambda x: display_team(x, lang))
+    if lang == "zh":
+        miss_notes = {
+            1978: "1970 未进正赛；1974 为第二阶段小组，不是连续两届淘汰赛强队。",
+            1982: "1974 小组赛；1978 进三四名赛，但不在 1974/1978 冠军链来源中。",
+            1998: "法国缺席 1990/1994 正赛，是明确的无前史主办国例外。",
+        }
+        misses["note"] = misses["year"].map(miss_notes)
+        return table_html(
+            misses,
+            ["year", "champion_display", "prior_windows", "ccs_candidates", "participants", "note"],
+            {
+                "year": "年份",
+                "champion_display": "冠军",
+                "prior_windows": "回看窗口",
+                "ccs_candidates": "CCS候选",
+                "participants": "参赛队",
+                "note": "为什么不是简单“连续淘汰赛强队”故事",
+            },
+        )
+    miss_notes = {
+        1978: "Argentina missed 1970; 1974 was a second-group-stage run, not two straight knockout-path validations.",
+        1982: "Italy exited in the 1974 group stage; 1978 reached the third-place match but was not in the 1974/1978 champion-chain source.",
+        1998: "France missed both 1990 and 1994, making it an explicit no-prior-history host exception.",
+    }
+    misses["note"] = misses["year"].map(miss_notes)
+    return table_html(
+        misses,
+        ["year", "champion_display", "prior_windows", "ccs_candidates", "participants", "note"],
+        {
+            "year": "Year",
+            "champion_display": "Champion",
+            "prior_windows": "Lookback window",
+            "ccs_candidates": "CCS pool",
+            "participants": "Teams",
+            "note": "Why this is not a simple repeated-knockout-team story",
+        },
+    )
+
+
+def path_exclusion_examples_html(summary: pd.DataFrame, lang: str) -> str:
+    examples = summary[
+        summary["year"].isin([1978, 1982, 1998, 2022])
+    ].copy()
+    examples["champion_display"] = examples["champion_name"].map(lambda x: display_team(x, lang))
+    if lang == "zh":
+        zh_evidence = {
+            1978: "1970 未进决赛圈；因此不适用排除命题。",
+            1982: "1978 第二阶段小组输给最终亚军荷兰。",
+            1998: "1990 和 1994 均未进决赛圈；因此不适用排除命题。",
+            2022: "2014 决赛输给冠军德国；2018 16强输给冠军法国。",
+        }
+        examples["状态"] = np.where(
+            examples["champion_prior_participated_both"].eq(0),
+            "前两届未都参加，不适用排除命题",
+            "前两届都参加，且有冠军/亚军路径接触",
+        )
+        examples["证据"] = examples["year"].map(zh_evidence)
+        return table_html(
+            examples,
+            ["year", "champion_display", "prior_windows", "状态", "证据"],
+            {"year": "年份", "champion_display": "冠军", "prior_windows": "前两届窗口"},
+        )
+    examples["Status"] = np.where(
+        examples["champion_prior_participated_both"].eq(0),
+        "Not covered by exclusion rule: did not play both prior finals",
+        "Played both prior finals and had champion/runner-up path contact",
+    )
+    examples["Evidence"] = examples["champion_contact_reasons"].replace(
+        "", "No path contact, but did not play both prior finals"
+    )
+    return table_html(
+        examples,
+        ["year", "champion_display", "prior_windows", "Status", "Evidence"],
+        {"year": "Year", "champion_display": "Champion", "prior_windows": "Prior two World Cups"},
+    )
+
+
 def render_report_en(context: dict) -> str:
     css = report_css()
     traps_html, watch_html, downgrade_2026_html = prepare_tables(context, "en")
+    examples_html = path_exclusion_examples_html(context["path_summary"], "en")
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -798,52 +1255,61 @@ def render_report_en(context: dict) -> str:
 <main class="page">
 <div class="eyebrow">World Cup predictor research memo</div>
 <h1>Champion-chain signal: a pre-tournament filter for real title contenders</h1>
-<p class="subhead">A reproducible backtest of the Champion-Chain Signal (CCS), plus a practical 1998 to 2026 pre-tournament lens for identifying recognizable contenders that deserve a champion-probability downgrade.</p>
+<p class="subhead">A reproducible backtest of a simple World Cup exclusion rule: if a team played both prior World Cups but had no champion/runner-up path contact in either, history has never produced the next champion from that bucket.</p>
 
 <section class="summary">
 <h2>Executive Summary</h2>
 <ul>
-<li><strong>CCS is a candidate-pool filter, not a champion picker.</strong> In the 1986-2022 modern knockout era, CCS retained only {context['ccs_pool_share']} of team-tournaments but covered {context['champ_all']} of all champions; after excluding the one no-prior-history case, coverage was {context['champ_evaluable']}.</li>
-<li><strong>The result is not a random one-third screen.</strong> A random candidate pool with each year's same size would expect only {context['random_expected']} champion hits out of 10; the probability of randomly reaching at least 9 hits is {context['random_prob']}.</li>
-<li><strong>A stronger simulation still supports the signal, but with humility.</strong> After preserving the mix of traditional title contenders and ordinary teams, a label-permutation control expects {context['strong_sim_expected']} hits out of 6 evaluable champions; reaching 6/6 is a {context['strong_sim_prob']} event.</li>
+<li><strong>The strongest claim is an exclusion rule, not a champion picker.</strong> From 1938 to 2022, {context['path_prior_both_total']} team-tournaments played both prior World Cups; {context['path_contact_total']} had champion/runner-up path contact, while {context['clean_non_contact_teams']} had none. That clean non-contact bucket produced {context['clean_non_contact_champions']} next champions.</li>
+<li><strong>This reframes the historical “misses.”</strong> Argentina 1978 and France 1998 are not counterexamples because they did not play both prior World Cups. Italy 1982 is not a counterexample because it played both, and in 1978 it lost to runner-up Netherlands in the second group stage.</li>
+<li><strong>The random benchmark is just probability multiplication, and that is the right first test.</strong> If each year randomly excluded the same number of teams as the clean non-contact bucket, the expected number of excluded champions is {context['path_random_expected']}; the exact probability of excluding zero champions is {context['path_random_zero_prob']}.</li>
+<li><strong>The Monte Carlo simulation is a sanity check, not a black box.</strong> A 200,000-run random redraw gives {context['path_random_zero_sim_prob']}, close to the exact probability. The report uses the exact value as the headline and keeps simulation as a reproducibility check.</li>
 <li><strong>The most useful reader experience is the pre-tournament downgrade list.</strong> From 1998 onward, a long list of recognizable contenders were highly ranked but non-CCS at kickoff. Many still advanced, including finalists, but none won in the modern sample.</li>
-<li><strong>The mechanism is partly strength, but more specific than strength.</strong> CCS overlaps with elite teams, yet it asks a narrower question: has this team recently been on, or directly removed from, the champion path?</li>
+<li><strong>The mechanism is partly strength, but more specific than strength.</strong> The rule asks a narrower question than ranking: did this team recently prove it could survive, win, or be eliminated by finalist-level opposition in the World Cup cycle?</li>
 </ul>
 </section>
 
 <div class="kpis">
-<div class="kpi"><div class="value">{context['champ_evaluable']}</div><div class="label">Evaluable modern champions covered</div></div>
-<div class="kpi"><div class="value">{context['champ_all']}</div><div class="label">All modern champions covered</div></div>
-<div class="kpi"><div class="value">{context['ccs_pool_share']}</div><div class="label">Modern candidate-pool share</div></div>
-<div class="kpi"><div class="value">{context['random_prob']}</div><div class="label">Random same-size pool reaches ≥9/10</div></div>
+<div class="kpi"><div class="value">{context['clean_non_contact_champions_short']}</div><div class="label">Champions from clean non-contact bucket</div></div>
+<div class="kpi"><div class="value">{context['path_contact_vs_clean']}</div><div class="label">Path-contact vs clean among prior-two participants</div></div>
+<div class="kpi"><div class="value">{context['path_champion_contact_short']}</div><div class="label">Two-prior-participation champions with path contact</div></div>
+<div class="kpi"><div class="value">{context['path_random_zero_prob']}</div><div class="label">Random same-size exclusion also avoids all champions</div></div>
 </div>
 
-<h2>1. CCS gets more concentrated as the tournament gets serious</h2>
+<h2>1. Historical rule: the exclusion bucket has produced zero champions</h2>
+<p><strong>The rule is intentionally narrow.</strong> A team is put in the exclusion bucket only when it played both prior World Cups and, across all knockout or championship-phase appearances in those two tournaments, it neither won the tournament nor lost to that tournament's champion or runner-up. In 1974, 1978, and 1982, the second group stage is treated as a championship phase because those formats did not use a modern round-of-16 bracket.</p>
+<p><strong>The prior-two-participation gate is deliberately strict, so the right comparison is inside that same gate.</strong> Across the 1938-2022 target sample, there are {context['path_team_tournaments_total']} team-tournaments. Only {context['path_prior_both_total']} played both prior World Cups; among those, {context['path_contact_total']} had champion/runner-up path contact and {context['clean_non_contact_teams']} did not.</p>
+<p><strong>The 65 count is team-tournaments, not unique teams.</strong> It is the clean side of a {context['path_contact_total']} vs {context['clean_non_contact_teams']} split among teams that passed the strict prior-participation gate, not a hand-picked list of isolated cases.</p>
+<div class="figure"><img src="{context['fig_history_en']}" alt="Historical path exclusion scope"><div class="caption">Blue tiles show champions that had prior path contact after playing both prior tournaments. Gray tiles show champions outside the rule because they did not play both prior tournaments. There are no red violation tiles.</div></div>
+<p><strong>The apparent exceptions disappear under this stricter definition.</strong> Argentina 1978 did not play the 1970 finals. France 1998 did not play either 1990 or 1994. Italy 1982 did play both prior tournaments, but in 1978 it lost to the eventual runner-up, the Netherlands, during the second group stage.</p>
+{examples_html}
+
+<h2>2. Modern standard-format sample: CCS gets more concentrated as the tournament gets serious</h2>
 <p><strong>The primary backtest pattern is monotonic.</strong> CCS teams are about three-tenths of the field, but their share rises at every deeper stage: round of 16, quarter-finals, semi-finals, final, and champion. This makes the signal more useful as a championship filter than as a generic knockout-stage prediction tool.</p>
 <div class="figure"><img src="{context['fig_funnel_en']}" alt="CCS modern stage funnel"><div class="caption">Modern era is 1986-2022. Champion coverage is 9/10 on the all-champion denominator and 9/9 after removing France 1998, which had no prior-two-World-Cup finals history.</div></div>
 
-<h2>2. Method and simulation: stronger than random, not proof by itself</h2>
-<p><strong>The method has two layers.</strong> First, CCS is defined before the tournament from the prior two World Cups only: a team qualifies if it recently won the World Cup or was knocked out by a later finalist. Second, the report tests whether that pre-tournament label covers champions better than no-information and strong-team controls.</p>
-<p><strong>A same-size random pool is the first hurdle.</strong> If 1998 has 11 CCS candidates out of 32 teams, the random benchmark also randomly selects 11 of 32. Repeating that across the ten modern tournaments yields an expected {context['random_expected']} champion hits, not nine. Hitting at least nine by chance is a {context['random_prob']} event.</p>
-<div class="figure"><img src="{context['fig_random_en']}" alt="Random benchmark chart"><div class="caption">The benchmark preserves each year's candidate-pool size, so it tests information content rather than simply rewarding CCS for selecting more teams.</div></div>
-<p><strong>The stronger control asks whether CCS is merely a famous-team label.</strong> For each tournament from 1998 to 2022, we preserve the number of CCS labels inside the traditional title-contender set and outside it, then randomly permute the labels inside those two groups. Excluding the explicit France 1998 no-prior-history exception, CCS hit 6/6 evaluable champions; the strong-label permutation expects {context['strong_sim_expected']}/6, and reaches 6/6 with probability {context['strong_sim_prob']}.</p>
+<h2>3. Method and simulation: exact benchmark first, simulation second</h2>
+<p><strong>The exact benchmark is simple.</strong> In each year, randomly exclude the same number of teams as the rule excludes. The chance that the champion is not excluded is one minus that year's excluded-team share. Multiplying those yearly keep-probabilities gives the exact chance of avoiding every champion by random luck.</p>
+<p><strong>The Monte Carlo simulation only verifies the arithmetic.</strong> The script also redraws those same-size random exclusion pools 200,000 times. The simulated probability of excluding zero champions is {context['path_random_zero_sim_prob']}, while the exact probability is {context['path_random_zero_prob']}.</p>
+<div class="figure"><img src="{context['fig_random_en']}" alt="Random benchmark chart"><div class="caption">The rule excludes {context['clean_non_contact_teams']} team-tournaments and zero champions. A same-size random exclusion pool would exclude {context['path_random_expected']} champions in expectation.</div></div>
+<p><strong>The stronger control asks whether CCS is merely a famous-team label.</strong> This simulation is intentionally limited to 1998-2022, where the report has a consistent pre-tournament FIFA ranking layer and a defensible modern title-contender set. For each tournament, we preserve the number of CCS labels inside the traditional title-contender set and outside it, then randomly permute the labels inside those two groups. Excluding the explicit France 1998 no-prior-history exception, CCS hit 6/6 evaluable champions; the strong-label permutation expects {context['strong_sim_expected']}/6, and reaches 6/6 with probability {context['strong_sim_prob']}.</p>
 <div class="figure"><img src="{context['fig_sim_en']}" alt="Strong-team permutation simulation"><div class="caption">This is deliberately not a FIFA-ranking simulation. It controls for the broader fact that CCS often overlaps with obvious football powers, then asks whether the specific champion-chain label still carries information.</div></div>
 <div class="callout warn"><strong>Interpretation discipline:</strong> these simulations support CCS as a credible screening heuristic. They do not prove it beats Elo, betting odds, or a full multivariate model. The next bar is incremental value versus those stronger baselines.</div>
 
-<h2>3. The pre-tournament experience: recognizable favorites CCS would downgrade</h2>
+<h2>4. The pre-tournament experience: recognizable favorites CCS would downgrade</h2>
 <p><strong>This is the most intuitive way to use the method.</strong> Before kickoff, a team can be highly ranked, historically recognizable, and still lack a recent champion-chain connection. The main exhibit is curated from a Top-20 non-CCS audit pool to show the teams a modern audience would naturally treat as title-relevant: Argentina, Germany, England, Spain, Portugal, Netherlands, Belgium, Colombia, Croatia, and Uruguay.</p>
 <div class="figure"><img src="{context['fig_traps_en']}" alt="Recognizable non-CCS title contenders"><div class="caption">Curated from qualified teams that were FIFA Top 20 and non-CCS at kickoff. The full mechanical Top-20 audit table is retained in data/derived/favorite_traps.csv; the curated list is retained in data/derived/favorite_trap_powerhouses.csv.</div></div>
 {traps_html}
 <p><strong>The pattern is useful but not absolute.</strong> Non-CCS strong teams can go deep: 2002 Germany, 2010 Netherlands, and 2014 Argentina reached finals. The historical point is narrower and stronger: in the modern sample, the champion almost always came from the CCS side of the field.</p>
 
-<h2>4. 2026 application: separate rank strength from champion-chain strength</h2>
+<h2>5. 2026 application: separate rank strength from champion-chain strength</h2>
 <p><strong>The 2026 view is a live-use case, not a backtest result.</strong> The ranking snapshot is frozen at FIFA's June 11, 2026 official ranking and the qualified-team list is from FIFA's 2026 season endpoint. The headline application is clear: Spain, Portugal, Brazil, Germany, and Colombia are rank-strong, reputation-strong, but non-CCS before kickoff.</p>
 {downgrade_2026_html}
 <p>The broader watchlist below keeps the full top-ranked context visible, so the downgrade call is not hidden inside a hand-picked list.</p>
-<div class="figure"><img src="{context['fig_2026_en']}" alt="2026 ranked watchlist"><div class="caption">Top 24 ranked qualified teams in the 2026 field. Blue teams have CCS support from 2018 or 2022; red teams are rank-strong but non-CCS.</div></div>
+<div class="figure"><img src="{context['fig_2026_en']}" alt="2026 ranked non-CCS contenders"><div class="caption">Five high-reputation 2026 qualifiers that are outside the CCS pool before kickoff. The table below keeps the broader top-ranked context.</div></div>
 {watch_html}
 
-<h2>5. Why this happens: strength matters, but path matters too</h2>
+<h2>6. Why this happens: strength matters, but path matters too</h2>
 <p><strong>CCS partly captures strength, and that should be acknowledged.</strong> Champions, finalists, and teams beaten by finalists are usually strong teams. A signal built from those events will naturally overlap with FIFA ranking, odds, and historical reputation.</p>
 <p><strong>But CCS is not simply 'teams that often qualify' or 'teams that are highly ranked.'</strong> It requires a specific recent relationship to the champion path: either winning the World Cup or being knocked out by a finalist. A team can be ranked highly, qualify regularly, or have reached a quarter-final and still be non-CCS if it did not touch that path.</p>
 <p><strong>The proposed mechanism is tournament-cycle validation.</strong> Recent champion-chain contact is a proxy for having already met World Cup knockout intensity against finalist-level opposition. It is not causal proof; it is a compact historical state variable that seems especially relevant for champions rather than finalists.</p>
@@ -864,9 +1330,12 @@ def render_report_en(context: dict) -> str:
 
 <h2>Caveats And Assumptions</h2>
 <ul>
-<li>The modern champion sample has only 10 observations. The 100% evaluable number is 9/9, not a stable law.</li>
-<li>France 1998 is treated as a no-prior-history exception because it missed the prior two World Cup finals tournaments.</li>
-<li>FIFA ranking is used as a public strong-team proxy; odds and Elo would be better next-step baselines.</li>
+<li>The headline exclusion test uses team-tournaments, not unique national teams. A country can appear multiple times if it satisfies the rule in multiple World Cup cycles.</li>
+<li>1950 remains in the target-year audit because the rule evaluates whether the next champion had prior-two-World-Cup path contact; the target tournament itself does not need a knockout bracket for that question.</li>
+<li>For 1974, 1978, and 1982, second group stage matches are treated as championship-phase matches because those tournaments used hybrid formats rather than a modern bracket.</li>
+<li>The random benchmark is an exact same-size random exclusion calculation. The Monte Carlo simulation is only a reproducibility check of that arithmetic.</li>
+<li>The strong-team permutation simulation remains a modern 1998-2022 control, not a full-history simulation, because it depends on consistent modern ranking context and curated title-contender labels.</li>
+<li>FIFA ranking is used lightly as a public audit proxy; odds and Elo would be better next-step baselines.</li>
 <li>2026 outcomes are not used in the 2026 watchlist. The ranking date is frozen at June 11, 2026.</li>
 </ul>
 
@@ -884,6 +1353,7 @@ def render_report_zh(context: dict) -> str:
     body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif; }
     """
     traps_html, watch_html, downgrade_2026_html = prepare_tables(context, "zh")
+    examples_html = path_exclusion_examples_html(context["path_summary"], "zh")
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -895,52 +1365,61 @@ def render_report_zh(context: dict) -> str:
 <main class="page">
 <div class="eyebrow">世界杯预测研究备忘录</div>
 <h1>冠军链信号：一个赛前冠军候选过滤器</h1>
-<p class="subhead">本报告对世界杯 Champion-Chain Signal（CCS）做可复现回测，并把它转化为 1998 至 2026 的赛前使用框架：哪些声望强、舆论热、看起来像冠军候选的球队，实际上应在夺冠概率上被降权。</p>
+<p class="subhead">本报告论证一个更锋利的世界杯赛前排除规则：如果一支球队前两届都正常参加决赛圈，但两届里没有任何冠军/亚军路径接触，历史上还没有这样的球队在下一届夺冠。</p>
 
 <section class="summary">
 <h2>执行摘要</h2>
 <ul>
-<li><strong>CCS 是冠军候选池过滤器，不是单点冠军预测器。</strong> 在 1986-2022 现代淘汰赛时代，CCS 只保留 {context['ccs_pool_share']} 的球队-届次，却覆盖全部现代冠军中的 {context['champ_all']}；若剔除唯一“前两届无可判定世界杯前史”的法国 1998，则为 {context['champ_evaluable']}。</li>
-<li><strong>这不是随机挑三成球队就能得到的结果。</strong> 若每届随机抽取与 CCS 同等规模的候选池，10 届期望只命中 {context['random_expected']} 个冠军；随机达到至少 9 次命中的概率只有 {context['random_prob']}。</li>
-<li><strong>更强的 simulation 也支持这个信号，但要克制解读。</strong> 在保留“传统强队/普通队”结构后随机置换 CCS 标签，6 个可判定冠军的期望命中为 {context['strong_sim_expected']} 个；达到 6/6 的概率为 {context['strong_sim_prob']}。</li>
+<li><strong>最强结论是排除规则，不是单点冠军预测器。</strong> 1938-2022 年间，{context['path_prior_both_total']} 个球队-届次满足“前两届都参赛”；其中 {context['path_contact_total']} 个有冠军/亚军路径接触，{context['clean_non_contact_teams']} 个没有。后者成为下一届冠军的次数是 {context['clean_non_contact_champions']}。</li>
+<li><strong>这会重新解释所谓历史漏点。</strong> 1978 阿根廷和 1998 法国不是反例，因为它们前两届没有都正常参加决赛圈。1982 意大利也不是反例，因为它前两届都参赛，且 1978 年第二阶段小组输给了当届亚军荷兰。</li>
+<li><strong>随机基准本质就是概率乘法，而且这是正确的第一道检验。</strong> 如果每届随机排除与 clean non-contact 池同样数量的球队，期望会误排 {context['path_random_expected']} 个冠军；精确算出来，随机排除却 0 次排到冠军的概率是 {context['path_random_zero_prob']}。</li>
+<li><strong>Monte Carlo simulation 只是复核，不是黑箱。</strong> 20 万次随机重抽得到 {context['path_random_zero_sim_prob']}，与精确概率接近。报告用精确值作 headline，把 simulation 作为可复现 sanity check。</li>
 <li><strong>最有体感的用法，是赛前热门队降权清单。</strong> 1998 年以来，一众排名高、名气大、今天读者也会认为有冠军叙事的强队，在开赛前并非 CCS。它们并不一定弱，甚至可能进决赛，但现代样本里没有最终夺冠。</li>
-<li><strong>机制上，CCS 有强队效应，但比“强队”更窄。</strong> 它问的不是球队是否有名、排名是否高，而是它最近两届是否已经进入过冠军路径，或被冠军/亚军直接淘汰验证过。</li>
+<li><strong>机制上，它有强队效应，但比“强队”更窄。</strong> 它问的不是球队是否有名、排名是否高，而是它最近两届是否已经在世界杯周期里被冠军级或亚军级对手验证过。</li>
 </ul>
 </section>
 
 <div class="kpis">
-<div class="kpi"><div class="value">{context['champ_evaluable']}</div><div class="label">可判定现代冠军覆盖</div></div>
-<div class="kpi"><div class="value">{context['champ_all']}</div><div class="label">全部现代冠军覆盖</div></div>
-<div class="kpi"><div class="value">{context['ccs_pool_share']}</div><div class="label">现代候选池占比</div></div>
-<div class="kpi"><div class="value">{context['random_prob']}</div><div class="label">随机同规模池达到 ≥9/10</div></div>
+<div class="kpi"><div class="value">{context['clean_non_contact_champions_short']}</div><div class="label">干净非接触池冠军数</div></div>
+<div class="kpi"><div class="value">{context['path_contact_vs_clean']}</div><div class="label">前两届参赛样本：路径接触 vs 无接触</div></div>
+<div class="kpi"><div class="value">{context['path_champion_contact_short']}</div><div class="label">前两届都参赛冠军具备路径接触</div></div>
+<div class="kpi"><div class="value">{context['path_random_zero_prob']}</div><div class="label">同规模随机排除也 0 误伤冠军</div></div>
 </div>
 
-<h2>1. 赛事越深入，CCS 越集中</h2>
+<h2>1. 历史规则：干净非接触池没有出过冠军</h2>
+<p><strong>这条规则刻意很窄。</strong> 只有当一支球队前两届都参加了世界杯决赛圈，并且这两届所有淘汰赛/争冠阶段经历中，既没有自己夺冠，也没有输给当届冠军或亚军，才进入排除池。1974、1978、1982 的第二阶段小组被视为争冠阶段，因为这些年份不是现代 16 强淘汰赛结构。</p>
+<p><strong>“前两届都参赛”这个门槛确实苛刻，所以要在同一个门槛内对比。</strong> 1938-2022 的目标样本共有 {context['path_team_tournaments_total']} 个球队-届次；其中只有 {context['path_prior_both_total']} 个满足“前两届都参赛”。在这 {context['path_prior_both_total']} 个里面，{context['path_contact_total']} 个有过冠军/亚军路径接触，{context['clean_non_contact_teams']} 个没有。</p>
+<p><strong>65 个不是 65 支唯一球队，而是 65 个球队-届次。</strong> 它是严格参赛门槛之后的“干净无接触”一侧，对照组是同样满足前两届参赛条件、但已经有冠亚军路径接触的 {context['path_contact_total']} 个球队-届次。</p>
+<div class="figure"><img src="{context['fig_history_zh']}" alt="Historical path exclusion scope"><div class="caption">蓝色代表冠军在前两届都参赛且已有路径接触；灰色代表冠军不适用排除命题，因为前两届没有都参赛。图中没有红色反例。</div></div>
+<p><strong>看似的例外，在这个定义下会消失。</strong> 1978 阿根廷没有参加 1970 决赛圈；1998 法国没有参加 1990 和 1994 决赛圈；1982 意大利虽然前两届都参赛，但 1978 年第二阶段小组输给了最终亚军荷兰。</p>
+{examples_html}
+
+<h2>2. 现代标准赛制样本：赛事越深入，CCS 越集中</h2>
 <p><strong>核心回测形态是单调上升。</strong> CCS 球队约占全部参赛队三成，但从 16 强、8 强、4 强、决赛到冠军，其占比逐层上升。这意味着 CCS 更像“冠军过滤器”，而不是普通的淘汰赛晋级预测器。</p>
 <div class="figure"><img src="{context['fig_funnel_zh']}" alt="CCS modern stage funnel"><div class="caption">现代时代定义为 1986-2022。全部冠军口径为 9/10；剔除 1998 法国这一前两届无世界杯决赛圈前史样本后为 9/9。</div></div>
 
-<h2>2. 方法与 simulation：强于随机，但不是单独证明</h2>
-<p><strong>方法分两层。</strong> 第一，CCS 只使用赛前已知的前两届世界杯信息：球队若最近夺冠，或被后来的冠亚军淘汰，就进入冠军链候选池。第二，报告检验这个赛前标签是否比无信息随机池和“强队标签”控制更能覆盖冠军。</p>
-<p><strong>同规模随机候选池是第一道合理门槛。</strong> 如果 1998 年 CCS 候选池是 32 队中的 11 队，那么随机基准也只随机抽 11 队。把这个逻辑重复到 10 届现代世界杯，随机期望命中只有 {context['random_expected']} 个冠军，而不是 9 个；随机达到至少 9 次命中的概率仅 {context['random_prob']}。</p>
-<div class="figure"><img src="{context['fig_random_zh']}" alt="Random benchmark chart"><div class="caption">该基准保留每届实际 CCS 候选池规模，因此检验的是“信息量”，不是简单奖励候选池更大。</div></div>
-<p><strong>更强的控制，是检验 CCS 是否只是“强队标签”。</strong> 对 1998-2022 每届世界杯，我们保留 CCS 在“传统冠军叙事队”和普通队中的数量，再在两个组内随机置换 CCS 标签。剔除法国 1998 这个明确无前史例外后，CCS 实际命中 6/6 个可判定冠军；强队标签置换的期望为 {context['strong_sim_expected']}/6，达到 6/6 的概率为 {context['strong_sim_prob']}。</p>
+<h2>3. 方法与 simulation：先精确基准，再 simulation 复核</h2>
+<p><strong>精确基准很简单。</strong> 每一届随机排除与规则排除池同样数量的球队。冠军不被随机排除的概率，就是 1 减去该届排除池占比。把各届“冠军没被排除”的概率相乘，就得到随机同规模排除却一次都没误排冠军的精确概率。</p>
+<p><strong>Monte Carlo simulation 只是复核这个乘法。</strong> 脚本另外做 20 万次同规模随机重抽；模拟得到 0 次误排冠军的概率为 {context['path_random_zero_sim_prob']}，精确概率为 {context['path_random_zero_prob']}。</p>
+<div class="figure"><img src="{context['fig_random_zh']}" alt="Random benchmark chart"><div class="caption">规则排除 {context['clean_non_contact_teams']} 个球队-届次，且 0 次排到冠军。同规模随机排除的期望误排冠军数为 {context['path_random_expected']}。</div></div>
+<p><strong>更强的控制，是检验 CCS 是否只是“强队标签”。</strong> 这个 simulation 明确限制在 1998-2022，因为这一段有一致的赛前 FIFA 排名语境，也更适合人工定义“现代冠军叙事队”。我们保留 CCS 在“传统冠军叙事队”和普通队中的数量，再在两个组内随机置换 CCS 标签。剔除法国 1998 这个明确无前史例外后，CCS 实际命中 6/6 个可判定冠军；强队标签置换的期望为 {context['strong_sim_expected']}/6，达到 6/6 的概率为 {context['strong_sim_prob']}。</p>
 <div class="figure"><img src="{context['fig_sim_zh']}" alt="Strong-team permutation simulation"><div class="caption">这不是世界排名 simulation。它控制的是“CCS 本来就会和传统强队重叠”这件事，再检验具体的冠军链标签是否还有额外信息。</div></div>
 <div class="callout warn"><strong>解释边界：</strong> 这些 simulation 支持 CCS 是一个可信的筛选启发式，但尚不能证明它优于 Elo、赔率或多变量模型。下一步应检验相对于强基准的增量价值。</div>
 
-<h2>3. 赛前使用体验：哪些强队/豪门应被 CCS 降权</h2>
+<h2>4. 赛前使用体验：哪些强队/豪门应被 CCS 降权</h2>
 <p><strong>这是最容易让读者理解的方法使用场景。</strong> 开赛前，一支球队可以排名很高、历史声望很强、舆论很热，但仍然缺少最近两届的冠军链连接。主图从“FIFA Top 20 且非 CCS”的审计池里人工策展，重点保留今天读者也会自然认为与冠军叙事相关的强队：阿根廷、德国、英格兰、西班牙、葡萄牙、荷兰、比利时、哥伦比亚、克罗地亚、乌拉圭。</p>
 <div class="figure"><img src="{context['fig_traps_zh']}" alt="Recognizable non-CCS title contenders"><div class="caption">样本来自开赛前 FIFA Top 20 且非 CCS 的入围队；主图展示人工策展的强队/豪门清单。完整机械 Top 20 审计表保留在 data/derived/favorite_traps.csv；策展清单保留在 data/derived/favorite_trap_powerhouses.csv。</div></div>
 {traps_html}
 <p><strong>这个信号有用，但不是绝对排除。</strong> 非 CCS 强队可以走很远：2002 德国、2010 荷兰、2014 阿根廷都进入决赛。更准确的结论是：现代样本里，最终冠军几乎总来自 CCS 一侧。</p>
 
-<h2>4. 2026 应用：区分排名强与冠军链强</h2>
+<h2>5. 2026 应用：区分排名强与冠军链强</h2>
 <p><strong>2026 是实时应用场景，不是回测结果。</strong> 本报告将排名快照冻结在 FIFA 2026 年 6 月 11 日官方排名，并使用 FIFA 2026 赛季接口中的入围队名单。最直接的赛前结论是：西班牙、葡萄牙、巴西、德国、哥伦比亚，都是排名强、声望强，但开赛前非 CCS 的豪强。</p>
 {downgrade_2026_html}
 <p>下方完整观察表保留头部排名上下文，避免把 2026 的降权判断藏在人工挑选名单里。</p>
-<div class="figure"><img src="{context['fig_2026_zh']}" alt="2026 ranked watchlist"><div class="caption">2026 已入围球队中排名前 24 的队伍。蓝色代表 2018 或 2022 提供 CCS 支持；红色代表排名强但非 CCS。</div></div>
+<div class="figure"><img src="{context['fig_2026_zh']}" alt="2026 ranked non-CCS contenders"><div class="caption">2026 已入围球队中五支高声望但非 CCS 的豪强；下方表格保留更完整的头部排名上下文。</div></div>
 {watch_html}
 
-<h2>5. 为什么会这样：强队重要，但路径也重要</h2>
+<h2>6. 为什么会这样：强队重要，但路径也重要</h2>
 <p><strong>首先要承认，CCS 确实部分捕捉了强队效应。</strong> 冠军、亚军，以及被冠亚军淘汰的球队，本来就往往是强队。因此 CCS 与 FIFA 排名、赔率、历史声望存在天然重叠。</p>
 <p><strong>但 CCS 并不等同于“经常入围”或“排名很高”。</strong> 它要求球队在最近两届与冠军路径发生过具体关系：自己夺冠，或被最终冠亚军淘汰。一个队可以排名高、经常参赛、甚至进过 8 强，但如果没有触碰冠军路径，仍然可能是非 CCS。</p>
 <p><strong>更合理的机制解释是“锦标赛周期验证”。</strong> 最近两届与冠军链发生联系，意味着球队已经在世界杯淘汰赛强度下被冠军级对手验证过。这不是因果证明，而是一个紧凑的历史状态变量；它对冠军列尤其有解释力。</p>
@@ -961,9 +1440,12 @@ def render_report_zh(context: dict) -> str:
 
 <h2>限制与假设</h2>
 <ul>
-<li>现代冠军样本只有 10 个观测；“100% 可判定覆盖”是 9/9，不应被理解为稳定规律。</li>
-<li>1998 法国被视为无前史例外，因为它缺席此前两届世界杯决赛圈。</li>
-<li>FIFA 排名只是公开强队代理变量；赔率与 Elo 是下一步更强基准。</li>
+<li>主结论使用的是球队-届次，不是唯一国家队；同一国家在多个周期满足条件，会被计为多个样本点。</li>
+<li>1950 年保留在目标年份审计中，因为这条规则检验的是“下一届冠军在前两届是否有路径接触”；目标届本身不一定需要现代淘汰赛结构。</li>
+<li>1974、1978、1982 的第二阶段小组视为争冠阶段，因为这些年份采用混合赛制，不是现代淘汰赛签表。</li>
+<li>随机基准是同规模随机排除的精确概率计算；Monte Carlo simulation 只是复核这个乘法，不是黑箱模型。</li>
+<li>强队标签置换 simulation 仍是 1998-2022 的现代控制实验，不是全历史 simulation，因为它依赖一致的现代排名语境和人工冠军叙事标签。</li>
+<li>FIFA 排名只是轻量公开审计变量；赔率与 Elo 是下一步更强基准。</li>
 <li>2026 观察清单不使用 2026 赛果；排名快照冻结在 2026 年 6 月 11 日。</li>
 </ul>
 
@@ -980,9 +1462,13 @@ def main() -> None:
     set_chart_style()
 
     team_year = build_team_year()
+    historical_team_year, historical_summary, format_scope = build_historical_knockout_backtest()
+    path_detail, path_summary = build_path_exclusion_backtest()
+    path_random = exclusion_random_benchmark(path_summary)
     rankings = build_rankings()
     modern = pd.read_csv(DATA_RAW / "modern_ccs.csv")
     random_df = random_benchmark(modern)
+    historical_random = random_benchmark_from_summary(historical_summary, "historical_random_benchmark.csv")
     joined = build_favorite_traps(team_year, rankings)
     permutation_detail, permutation_summary = contender_permutation_benchmark(joined, modern)
     traps = pd.read_csv(DATA_DERIVED / "favorite_traps.csv")
@@ -996,25 +1482,70 @@ def main() -> None:
     champ_hits = modern["champ_ccs"].sum()
     champion_total = modern["champ_total"].sum()
     evaluable_total = champion_total - 1
+    historical_evaluable = historical_summary[historical_summary["evaluable"].eq(1)]
+    historical_hits = int(historical_evaluable["champ_ccs"].sum())
+    historical_total = int(len(historical_evaluable))
+    historical_pool_share = historical_evaluable["ccs_candidates"].sum() / historical_evaluable["participants"].sum()
+    path_team_tournaments_total = int(path_summary["participants"].sum())
+    path_prior_both_total = int(path_summary["prior_participated_both_teams"].sum())
+    path_contact_total = int(path_summary["path_contact_teams"].sum())
+    clean_non_contact_total = int(path_summary["clean_non_contact_teams"].sum())
+    clean_non_contact_champions = int(path_summary["clean_non_contact_champions"].sum())
+    path_champions_with_prior_both = int(path_summary["champion_prior_participated_both"].sum())
+    path_champions_with_contact = int(
+        (
+            path_summary["champion_prior_participated_both"].eq(1)
+            & path_summary["champion_path_contact"].eq(1)
+        ).sum()
+    )
 
     context = {
         "ccs_pool_share": pct(total_ccs / total_participants),
         "champ_all": f"{int(champ_hits)}/{int(champion_total)} ({pct(champ_hits / champion_total)})",
         "champ_evaluable": f"{int(champ_hits)}/{int(evaluable_total)} (100.0%)",
+        "champ_evaluable_short": f"{int(champ_hits)}/{int(evaluable_total)}",
+        "historical_champions": f"{historical_hits}/{historical_total} ({pct(historical_hits / historical_total)})",
+        "historical_champions_short": f"{historical_hits}/{historical_total}",
+        "historical_evaluable_total": historical_total,
+        "historical_actual_hits": historical_hits,
+        "historical_pool_share": pct(historical_pool_share),
+        "historical_random_expected": f"{historical_random['expected_random_hits'].iloc[0]:.1f}",
+        "historical_random_prob": f"{historical_random['prob_random_ge_actual'].iloc[0]:.4%}",
+        "path_total_target_years": int(len(path_summary)),
+        "path_team_tournaments_total": path_team_tournaments_total,
+        "path_prior_both_total": path_prior_both_total,
+        "path_contact_total": path_contact_total,
+        "path_contact_vs_clean": f"{path_contact_total}/{clean_non_contact_total}",
+        "clean_non_contact_teams": clean_non_contact_total,
+        "clean_non_contact_champions": clean_non_contact_champions,
+        "clean_non_contact_champions_short": f"{clean_non_contact_champions}/{clean_non_contact_total}",
+        "path_champion_contact_short": f"{path_champions_with_contact}/{path_champions_with_prior_both}",
+        "path_random_expected": f"{path_random['expected_random_excluded_champions'].iloc[0]:.1f}",
+        "path_random_zero_prob": f"{path_random['prob_random_zero_excluded_champions_exact'].iloc[0]:.1%}",
+        "path_random_zero_sim_prob": f"{path_random['prob_random_zero_excluded_champions_simulated'].iloc[0]:.1%}",
         "random_expected": f"{random_df['random_hit_probability'].sum():.1f}",
         "random_prob": f"{random_df['prob_random_ge_9_of_10'].iloc[0]:.3%}",
         "strong_sim_expected": f"{permutation_summary.loc[permutation_summary['scope'].eq('evaluable_ex_france_1998'), 'expected_permutation_hits'].iloc[0]:.1f}",
         "strong_sim_prob": f"{permutation_summary.loc[permutation_summary['scope'].eq('evaluable_ex_france_1998'), 'probability_ge_actual_exact'].iloc[0]:.1%}",
+        "fig_history_en": chart_historical_scope(path_summary, format_scope, "en"),
         "fig_funnel_en": chart_modern_funnel(modern, "en"),
-        "fig_random_en": chart_random_benchmark(random_df, "en"),
+        "fig_random_en": chart_random_benchmark(path_summary, "en"),
         "fig_traps_en": chart_favorite_traps(trap_powerhouses, "en"),
-        "fig_2026_en": chart_2026_watchlist(watch, "en"),
+        "fig_2026_en": chart_2026_watchlist(downgrade_2026, "en"),
         "fig_sim_en": chart_contender_permutation(permutation_summary, "en"),
+        "fig_history_zh": chart_historical_scope(path_summary, format_scope, "zh"),
         "fig_funnel_zh": chart_modern_funnel(modern, "zh"),
-        "fig_random_zh": chart_random_benchmark(random_df, "zh"),
+        "fig_random_zh": chart_random_benchmark(path_summary, "zh"),
         "fig_traps_zh": chart_favorite_traps(trap_powerhouses, "zh"),
-        "fig_2026_zh": chart_2026_watchlist(watch, "zh"),
+        "fig_2026_zh": chart_2026_watchlist(downgrade_2026, "zh"),
         "fig_sim_zh": chart_contender_permutation(permutation_summary, "zh"),
+        "historical_team_year": historical_team_year,
+        "historical_summary": historical_summary,
+        "path_detail": path_detail,
+        "path_summary": path_summary,
+        "path_random": path_random,
+        "format_scope": format_scope,
+        "historical_random": historical_random,
         "traps": traps,
         "trap_headliners": trap_headliners,
         "trap_powerhouses": trap_powerhouses,

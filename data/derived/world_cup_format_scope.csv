@@ -1,0 +1,23 @@
+year,participants,knockout_matches,has_knockout_path,included_in_historical_backtest,format_note
+1930,13,3,1,1,knockout path available
+1934,16,17,1,1,knockout path available
+1938,15,18,1,1,knockout path available
+1950,13,0,0,0,final-round-robin; no knockout-stage path
+1954,16,8,1,1,knockout path available
+1958,16,8,1,1,knockout path available
+1962,16,8,1,1,knockout path available
+1966,16,8,1,1,knockout path available
+1970,16,8,1,1,knockout path available
+1974,16,2,1,1,hybrid format; knockout path exists but is shorter than modern bracket
+1978,16,2,1,1,hybrid format; knockout path exists but is shorter than modern bracket
+1982,24,4,1,1,hybrid format; knockout path exists but is shorter than modern bracket
+1986,24,16,1,1,knockout path available
+1990,24,16,1,1,knockout path available
+1994,24,16,1,1,knockout path available
+1998,32,16,1,1,knockout path available
+2002,32,16,1,1,knockout path available
+2006,32,16,1,1,knockout path available
+2010,32,16,1,1,knockout path available
+2014,32,16,1,1,knockout path available
+2018,32,16,1,1,knockout path available
+2022,32,16,1,1,knockout path available
