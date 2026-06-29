@@ -68,9 +68,9 @@
 <div class="figure"><img src="assets/02_random_benchmark_en.png" alt="Random benchmark chart"><div class="caption">The benchmark preserves each year's candidate-pool size, so it tests information content rather than simply rewarding CCS for selecting more teams.</div></div>
 <div class="callout warn"><strong>Interpretation discipline:</strong> this proves CCS beats a no-information random screen. It does not prove CCS beats Elo, betting odds, or a full multivariate model. The next bar is incremental value versus those stronger baselines.</div>
 
-<h2>3. The pre-tournament experience: headline favorites CCS would downgrade</h2>
-<p><strong>This is the most intuitive way to use the method.</strong> Before kickoff, a team can be highly ranked and still lack a recent champion-chain connection. The main exhibit is intentionally strict: it shows only each tournament's highest-ranked non-CCS team, not the full Top-12 audit list. That keeps the chart focused on teams that were easiest to frame as serious title candidates at the time.</p>
-<div class="figure"><img src="assets/03_favorite_traps_en.png" alt="Highest-ranked non-CCS team by tournament"><div class="caption">For each tournament from 1998-2022, the chart selects the single highest FIFA-ranked qualified team that was non-CCS at kickoff. Red marks teams that still reached the final. The broader Top-12 audit table is retained in data/derived/favorite_traps.csv.</div></div>
+<h2>3. The pre-tournament experience: recognizable favorites CCS would downgrade</h2>
+<p><strong>This is the most intuitive way to use the method.</strong> Before kickoff, a team can be highly ranked, historically recognizable, and still lack a recent champion-chain connection. The main exhibit is curated from the Top-12 non-CCS audit pool to keep the reader experience focused on teams that a modern audience would naturally treat as title-relevant: Argentina, Germany, England, Spain, Portugal, Netherlands, Belgium, and Colombia.</p>
+<div class="figure"><img src="assets/03_favorite_traps_en.png" alt="Recognizable non-CCS title contenders"><div class="caption">Curated from qualified teams that were FIFA Top 12 and non-CCS at kickoff. The broader mechanical Top-12 audit table is retained in data/derived/favorite_traps.csv; the curated list is retained in data/derived/favorite_trap_powerhouses.csv.</div></div>
 <table class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
@@ -85,10 +85,10 @@
   <tbody>
     <tr>
       <td>1998</td>
-      <td>Mexico</td>
-      <td>MEX</td>
-      <td>#4</td>
-      <td>round of 16</td>
+      <td>Colombia</td>
+      <td>COL</td>
+      <td>#10</td>
+      <td>group stage</td>
       <td>1998-05-20</td>
     </tr>
     <tr>
@@ -100,11 +100,51 @@
       <td>2002-05-15</td>
     </tr>
     <tr>
-      <td>2006</td>
-      <td>Czech Republic</td>
-      <td>CZE</td>
-      <td>#2</td>
+      <td>2002</td>
+      <td>Portugal</td>
+      <td>PRT</td>
+      <td>#5</td>
       <td>group stage</td>
+      <td>2002-05-15</td>
+    </tr>
+    <tr>
+      <td>2002</td>
+      <td>Germany</td>
+      <td>DEU</td>
+      <td>#11</td>
+      <td>final</td>
+      <td>2002-05-15</td>
+    </tr>
+    <tr>
+      <td>2002</td>
+      <td>England</td>
+      <td>ENG</td>
+      <td>#12</td>
+      <td>quarter-finals</td>
+      <td>2002-05-15</td>
+    </tr>
+    <tr>
+      <td>2006</td>
+      <td>Spain</td>
+      <td>ESP</td>
+      <td>#5</td>
+      <td>round of 16</td>
+      <td>2006-05-17</td>
+    </tr>
+    <tr>
+      <td>2006</td>
+      <td>Portugal</td>
+      <td>PRT</td>
+      <td>#7</td>
+      <td>third-place match</td>
+      <td>2006-05-17</td>
+    </tr>
+    <tr>
+      <td>2006</td>
+      <td>Argentina</td>
+      <td>ARG</td>
+      <td>#9</td>
+      <td>quarter-finals</td>
       <td>2006-05-17</td>
     </tr>
     <tr>
@@ -116,6 +156,14 @@
       <td>2010-05-26</td>
     </tr>
     <tr>
+      <td>2010</td>
+      <td>Argentina</td>
+      <td>ARG</td>
+      <td>#7</td>
+      <td>quarter-finals</td>
+      <td>2010-05-26</td>
+    </tr>
+    <tr>
       <td>2014</td>
       <td>Argentina</td>
       <td>ARG</td>
@@ -124,11 +172,35 @@
       <td>2014-06-05</td>
     </tr>
     <tr>
-      <td>2018</td>
-      <td>Poland</td>
-      <td>POL</td>
+      <td>2014</td>
+      <td>Colombia</td>
+      <td>COL</td>
       <td>#8</td>
+      <td>quarter-finals</td>
+      <td>2014-06-05</td>
+    </tr>
+    <tr>
+      <td>2014</td>
+      <td>England</td>
+      <td>ENG</td>
+      <td>#10</td>
       <td>group stage</td>
+      <td>2014-06-05</td>
+    </tr>
+    <tr>
+      <td>2014</td>
+      <td>Belgium</td>
+      <td>BEL</td>
+      <td>#11</td>
+      <td>quarter-finals</td>
+      <td>2014-06-05</td>
+    </tr>
+    <tr>
+      <td>2018</td>
+      <td>England</td>
+      <td>ENG</td>
+      <td>#12</td>
+      <td>third-place match</td>
       <td>2018-06-07</td>
     </tr>
     <tr>
@@ -137,6 +209,14 @@
       <td>ESP</td>
       <td>#7</td>
       <td>round of 16</td>
+      <td>2022-10-06</td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>Portugal</td>
+      <td>PRT</td>
+      <td>#9</td>
+      <td>quarter-finals</td>
       <td>2022-10-06</td>
     </tr>
   </tbody>

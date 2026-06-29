@@ -29,7 +29,8 @@ The visible report merges findings and implications section-by-section so a read
 - `data/derived/ccs_team_year.csv`: team-year CCS flags for World Cups through 2022.
 - `data/derived/fifa_rankings_pre_wc.csv`: nearest pre-tournament ranking snapshot for 1998-2026.
 - `data/derived/favorite_traps.csv`: Top-12 FIFA-ranked teams that were not CCS candidates at tournament start; retained as the full audit table.
-- `data/derived/favorite_trap_headliners.csv`: each tournament's single highest-ranked non-CCS team; used for the main favorite-downgrade exhibit.
+- `data/derived/favorite_trap_headliners.csv`: each tournament's single highest-ranked non-CCS team; retained as a sensitivity/reference table.
+- `data/derived/favorite_trap_powerhouses.csv`: curated subset of the Top-12 non-CCS audit pool, focused on recognizable strong teams/title-relevant football brands for the main favorite-downgrade exhibit.
 - `data/derived/random_benchmark.csv`: random same-size candidate-pool benchmark.
 - `data/derived/ccs_2026_watchlist.csv`: 2026 ranked teams with CCS status.
 

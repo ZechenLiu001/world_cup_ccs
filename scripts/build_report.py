@@ -99,6 +99,20 @@ PERFORMANCE_ZH = {
     "not yet known": "待定",
 }
 
+CURATED_POWERHOUSE_TEAMS = {
+    "Argentina",
+    "Belgium",
+    "Brazil",
+    "Colombia",
+    "England",
+    "France",
+    "Germany",
+    "Italy",
+    "Netherlands",
+    "Portugal",
+    "Spain",
+}
+
 
 def norm_team(name: str) -> str:
     name = str(name).strip()
@@ -336,6 +350,8 @@ def build_favorite_traps(team_year: pd.DataFrame, rankings: pd.DataFrame) -> pd.
     traps.to_csv(DATA_DERIVED / "favorite_traps.csv", index=False)
     headliners = traps.groupby("year", as_index=False).head(1).copy()
     headliners.to_csv(DATA_DERIVED / "favorite_trap_headliners.csv", index=False)
+    powerhouses = traps[traps["team_name"].isin(CURATED_POWERHOUSE_TEAMS)].copy()
+    powerhouses.to_csv(DATA_DERIVED / "favorite_trap_powerhouses.csv", index=False)
 
     watch_2026 = joined[joined["year"].eq(2026)].sort_values("fifa_rank")
     watch_2026.to_csv(DATA_DERIVED / "ccs_2026_watchlist.csv", index=False)
@@ -460,7 +476,7 @@ def chart_favorite_traps(traps: pd.DataFrame, lang: str = "en") -> str:
     top["label"] = top["year"].astype(str) + " " + top["team_name"].map(lambda x: display_team(x, lang))
     top = top.sort_values(["year", "fifa_rank"])
     top["strength_score"] = 13 - top["fifa_rank"]
-    fig, ax = plt.subplots(figsize=(11.5, 5.7))
+    fig, ax = plt.subplots(figsize=(11.5, 7.4))
     y = np.arange(len(top))
     colors = np.where(top["performance"].str.lower().eq("final"), "#d15532", "#67758a")
     ax.barh(y, top["strength_score"], color=colors)
@@ -470,7 +486,7 @@ def chart_favorite_traps(traps: pd.DataFrame, lang: str = "en") -> str:
     ax.set_xticks([1, 3, 5, 7, 9, 11])
     ax.set_xticklabels(["#12", "#10", "#8", "#6", "#4", "#2"])
     ax.set_xlabel("赛前 FIFA 排名强度（越靠右越强）" if lang == "zh" else "Pre-tournament FIFA rank strength (farther right is stronger)")
-    ax.set_title("每届排名最高的非 CCS 队：真正需要赛前降权的头号热门" if lang == "zh" else "Each tournament's highest-ranked non-CCS team: the headline downgrade")
+    ax.set_title("强队/豪门但非 CCS：更有体感的赛前降权清单" if lang == "zh" else "Recognizable contenders, non-CCS: the intuitive pre-kickoff downgrade list")
     ax.grid(axis="x", color="#e8ebf1")
     ax.spines[["top", "right"]].set_visible(False)
     for i, (_, r) in enumerate(top.iterrows()):
@@ -577,7 +593,7 @@ def report_css() -> str:
 
 
 def prepare_tables(context: dict, lang: str) -> tuple[str, str]:
-    top_traps = context["trap_headliners"].copy()
+    top_traps = context["trap_powerhouses"].copy()
     top_traps["fifa_rank"] = top_traps["fifa_rank"].map(lambda x: f"#{int(x)}")
     watch = context["watch_2026"].copy()
     watch = watch[watch["fifa_rank"].le(16)].copy()
@@ -661,9 +677,9 @@ def render_report_en(context: dict) -> str:
 <div class="figure"><img src="{context['fig_random_en']}" alt="Random benchmark chart"><div class="caption">The benchmark preserves each year's candidate-pool size, so it tests information content rather than simply rewarding CCS for selecting more teams.</div></div>
 <div class="callout warn"><strong>Interpretation discipline:</strong> this proves CCS beats a no-information random screen. It does not prove CCS beats Elo, betting odds, or a full multivariate model. The next bar is incremental value versus those stronger baselines.</div>
 
-<h2>3. The pre-tournament experience: headline favorites CCS would downgrade</h2>
-<p><strong>This is the most intuitive way to use the method.</strong> Before kickoff, a team can be highly ranked and still lack a recent champion-chain connection. The main exhibit is intentionally strict: it shows only each tournament's highest-ranked non-CCS team, not the full Top-12 audit list. That keeps the chart focused on teams that were easiest to frame as serious title candidates at the time.</p>
-<div class="figure"><img src="{context['fig_traps_en']}" alt="Highest-ranked non-CCS team by tournament"><div class="caption">For each tournament from 1998-2022, the chart selects the single highest FIFA-ranked qualified team that was non-CCS at kickoff. Red marks teams that still reached the final. The broader Top-12 audit table is retained in data/derived/favorite_traps.csv.</div></div>
+<h2>3. The pre-tournament experience: recognizable favorites CCS would downgrade</h2>
+<p><strong>This is the most intuitive way to use the method.</strong> Before kickoff, a team can be highly ranked, historically recognizable, and still lack a recent champion-chain connection. The main exhibit is curated from the Top-12 non-CCS audit pool to keep the reader experience focused on teams that a modern audience would naturally treat as title-relevant: Argentina, Germany, England, Spain, Portugal, Netherlands, Belgium, and Colombia.</p>
+<div class="figure"><img src="{context['fig_traps_en']}" alt="Recognizable non-CCS title contenders"><div class="caption">Curated from qualified teams that were FIFA Top 12 and non-CCS at kickoff. The broader mechanical Top-12 audit table is retained in data/derived/favorite_traps.csv; the curated list is retained in data/derived/favorite_trap_powerhouses.csv.</div></div>
 {traps_html}
 <p><strong>The pattern is useful but not absolute.</strong> Non-CCS strong teams can go deep: 2002 Germany, 2010 Netherlands, and 2014 Argentina reached finals. The historical point is narrower and stronger: in the modern sample, the champion almost always came from the CCS side of the field.</p>
 
@@ -753,9 +769,9 @@ def render_report_zh(context: dict) -> str:
 <div class="figure"><img src="{context['fig_random_zh']}" alt="Random benchmark chart"><div class="caption">该基准保留每届实际 CCS 候选池规模，因此检验的是“信息量”，不是简单奖励候选池更大。</div></div>
 <div class="callout warn"><strong>解释边界：</strong> 随机基准只能证明 CCS 明显优于无信息随机筛选；它尚不能证明 CCS 优于 Elo、赔率或多变量模型。下一步应检验相对于强基准的增量价值。</div>
 
-<h2>3. 赛前使用体验：哪些头号热门应被 CCS 降权</h2>
-<p><strong>这是最容易让读者理解的方法使用场景。</strong> 开赛前，一支球队可以排名很高、阵容很强、舆论很热，但仍然缺少最近两届的冠军链连接。主图刻意采用更严格口径：每届只展示排名最高的非 CCS 球队，而不是把 Top 12 全量名单都画出来。这样能避免丹麦、秘鲁这类“排名高但不算夺冠大热”的二级样本稀释结论。</p>
-<div class="figure"><img src="{context['fig_traps_zh']}" alt="Highest-ranked non-CCS team by tournament"><div class="caption">1998-2022 年，每届只选开赛前 FIFA 排名最高的一支非 CCS 入围队。红色标记最终进入决赛的球队。更宽的 Top 12 审计清单保留在 data/derived/favorite_traps.csv。</div></div>
+<h2>3. 赛前使用体验：哪些强队/豪门应被 CCS 降权</h2>
+<p><strong>这是最容易让读者理解的方法使用场景。</strong> 开赛前，一支球队可以排名很高、历史声望很强、舆论很热，但仍然缺少最近两届的冠军链连接。主图从“FIFA Top 12 且非 CCS”的审计池里人工策展，重点保留今天读者也会自然认为与冠军叙事相关的强队：阿根廷、德国、英格兰、西班牙、葡萄牙、荷兰、比利时、哥伦比亚。</p>
+<div class="figure"><img src="{context['fig_traps_zh']}" alt="Recognizable non-CCS title contenders"><div class="caption">样本来自开赛前 FIFA Top 12 且非 CCS 的入围队；主图展示人工策展的强队/豪门清单。完整机械 Top 12 审计表保留在 data/derived/favorite_traps.csv；策展清单保留在 data/derived/favorite_trap_powerhouses.csv。</div></div>
 {traps_html}
 <p><strong>这个信号有用，但不是绝对排除。</strong> 非 CCS 强队可以走很远：2002 德国、2010 荷兰、2014 阿根廷都进入决赛。更准确的结论是：现代样本里，最终冠军几乎总来自 CCS 一侧。</p>
 
@@ -811,6 +827,7 @@ def main() -> None:
     joined = build_favorite_traps(team_year, rankings)
     traps = pd.read_csv(DATA_DERIVED / "favorite_traps.csv")
     trap_headliners = pd.read_csv(DATA_DERIVED / "favorite_trap_headliners.csv")
+    trap_powerhouses = pd.read_csv(DATA_DERIVED / "favorite_trap_powerhouses.csv")
     watch = pd.read_csv(DATA_DERIVED / "ccs_2026_watchlist.csv")
 
     total_ccs = modern["ccs"].sum()
@@ -827,16 +844,17 @@ def main() -> None:
         "random_prob": f"{random_df['prob_random_ge_9_of_10'].iloc[0]:.3%}",
         "fig_funnel_en": chart_modern_funnel(modern, "en"),
         "fig_random_en": chart_random_benchmark(random_df, "en"),
-        "fig_traps_en": chart_favorite_traps(trap_headliners, "en"),
+        "fig_traps_en": chart_favorite_traps(trap_powerhouses, "en"),
         "fig_2026_en": chart_2026_watchlist(watch, "en"),
         "fig_rank_bucket_en": chart_rank_bucket(joined, "en"),
         "fig_funnel_zh": chart_modern_funnel(modern, "zh"),
         "fig_random_zh": chart_random_benchmark(random_df, "zh"),
-        "fig_traps_zh": chart_favorite_traps(trap_headliners, "zh"),
+        "fig_traps_zh": chart_favorite_traps(trap_powerhouses, "zh"),
         "fig_2026_zh": chart_2026_watchlist(watch, "zh"),
         "fig_rank_bucket_zh": chart_rank_bucket(joined, "zh"),
         "traps": traps,
         "trap_headliners": trap_headliners,
+        "trap_powerhouses": trap_powerhouses,
         "watch_2026": watch,
     }
 

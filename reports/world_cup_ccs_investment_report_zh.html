@@ -71,9 +71,9 @@
 <div class="figure"><img src="assets/02_random_benchmark_zh.png" alt="Random benchmark chart"><div class="caption">该基准保留每届实际 CCS 候选池规模，因此检验的是“信息量”，不是简单奖励候选池更大。</div></div>
 <div class="callout warn"><strong>解释边界：</strong> 随机基准只能证明 CCS 明显优于无信息随机筛选；它尚不能证明 CCS 优于 Elo、赔率或多变量模型。下一步应检验相对于强基准的增量价值。</div>
 
-<h2>3. 赛前使用体验：哪些头号热门应被 CCS 降权</h2>
-<p><strong>这是最容易让读者理解的方法使用场景。</strong> 开赛前，一支球队可以排名很高、阵容很强、舆论很热，但仍然缺少最近两届的冠军链连接。主图刻意采用更严格口径：每届只展示排名最高的非 CCS 球队，而不是把 Top 12 全量名单都画出来。这样能避免丹麦、秘鲁这类“排名高但不算夺冠大热”的二级样本稀释结论。</p>
-<div class="figure"><img src="assets/03_favorite_traps_zh.png" alt="Highest-ranked non-CCS team by tournament"><div class="caption">1998-2022 年，每届只选开赛前 FIFA 排名最高的一支非 CCS 入围队。红色标记最终进入决赛的球队。更宽的 Top 12 审计清单保留在 data/derived/favorite_traps.csv。</div></div>
+<h2>3. 赛前使用体验：哪些强队/豪门应被 CCS 降权</h2>
+<p><strong>这是最容易让读者理解的方法使用场景。</strong> 开赛前，一支球队可以排名很高、历史声望很强、舆论很热，但仍然缺少最近两届的冠军链连接。主图从“FIFA Top 12 且非 CCS”的审计池里人工策展，重点保留今天读者也会自然认为与冠军叙事相关的强队：阿根廷、德国、英格兰、西班牙、葡萄牙、荷兰、比利时、哥伦比亚。</p>
+<div class="figure"><img src="assets/03_favorite_traps_zh.png" alt="Recognizable non-CCS title contenders"><div class="caption">样本来自开赛前 FIFA Top 12 且非 CCS 的入围队；主图展示人工策展的强队/豪门清单。完整机械 Top 12 审计表保留在 data/derived/favorite_traps.csv；策展清单保留在 data/derived/favorite_trap_powerhouses.csv。</div></div>
 <table class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
@@ -88,10 +88,10 @@
   <tbody>
     <tr>
       <td>1998</td>
-      <td>墨西哥</td>
-      <td>MEX</td>
-      <td>#4</td>
-      <td>16强</td>
+      <td>哥伦比亚</td>
+      <td>COL</td>
+      <td>#10</td>
+      <td>小组赛</td>
       <td>1998-05-20</td>
     </tr>
     <tr>
@@ -103,11 +103,51 @@
       <td>2002-05-15</td>
     </tr>
     <tr>
-      <td>2006</td>
-      <td>捷克</td>
-      <td>CZE</td>
-      <td>#2</td>
+      <td>2002</td>
+      <td>葡萄牙</td>
+      <td>PRT</td>
+      <td>#5</td>
       <td>小组赛</td>
+      <td>2002-05-15</td>
+    </tr>
+    <tr>
+      <td>2002</td>
+      <td>德国</td>
+      <td>DEU</td>
+      <td>#11</td>
+      <td>决赛</td>
+      <td>2002-05-15</td>
+    </tr>
+    <tr>
+      <td>2002</td>
+      <td>英格兰</td>
+      <td>ENG</td>
+      <td>#12</td>
+      <td>8强</td>
+      <td>2002-05-15</td>
+    </tr>
+    <tr>
+      <td>2006</td>
+      <td>西班牙</td>
+      <td>ESP</td>
+      <td>#5</td>
+      <td>16强</td>
+      <td>2006-05-17</td>
+    </tr>
+    <tr>
+      <td>2006</td>
+      <td>葡萄牙</td>
+      <td>PRT</td>
+      <td>#7</td>
+      <td>季军赛</td>
+      <td>2006-05-17</td>
+    </tr>
+    <tr>
+      <td>2006</td>
+      <td>阿根廷</td>
+      <td>ARG</td>
+      <td>#9</td>
+      <td>8强</td>
       <td>2006-05-17</td>
     </tr>
     <tr>
@@ -119,6 +159,14 @@
       <td>2010-05-26</td>
     </tr>
     <tr>
+      <td>2010</td>
+      <td>阿根廷</td>
+      <td>ARG</td>
+      <td>#7</td>
+      <td>8强</td>
+      <td>2010-05-26</td>
+    </tr>
+    <tr>
       <td>2014</td>
       <td>阿根廷</td>
       <td>ARG</td>
@@ -127,11 +175,35 @@
       <td>2014-06-05</td>
     </tr>
     <tr>
-      <td>2018</td>
-      <td>波兰</td>
-      <td>POL</td>
+      <td>2014</td>
+      <td>哥伦比亚</td>
+      <td>COL</td>
       <td>#8</td>
+      <td>8强</td>
+      <td>2014-06-05</td>
+    </tr>
+    <tr>
+      <td>2014</td>
+      <td>英格兰</td>
+      <td>ENG</td>
+      <td>#10</td>
       <td>小组赛</td>
+      <td>2014-06-05</td>
+    </tr>
+    <tr>
+      <td>2014</td>
+      <td>比利时</td>
+      <td>BEL</td>
+      <td>#11</td>
+      <td>8强</td>
+      <td>2014-06-05</td>
+    </tr>
+    <tr>
+      <td>2018</td>
+      <td>英格兰</td>
+      <td>ENG</td>
+      <td>#12</td>
+      <td>季军赛</td>
       <td>2018-06-07</td>
     </tr>
     <tr>
@@ -140,6 +212,14 @@
       <td>ESP</td>
       <td>#7</td>
       <td>16强</td>
+      <td>2022-10-06</td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>葡萄牙</td>
+      <td>PRT</td>
+      <td>#9</td>
+      <td>8强</td>
       <td>2022-10-06</td>
     </tr>
   </tbody>
