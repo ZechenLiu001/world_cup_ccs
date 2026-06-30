@@ -1,0 +1,2 @@
+year,team_name,bookmaker_or_market,decimal_odds,snapshot_date,implied_probability_formula
+required,required,required,required,required,"1 / decimal_odds, normalized within tournament if overround is present"

@@ -1,46 +1,65 @@
-# World Cup Champion-Chain Signal Predictor
+# World Cup Champion-Chain Signal
 
-Investment-grade backtest and pre-tournament application report for the World Cup Champion-Chain Signal (CCS).
+This repository is a clean report package for the World Cup Champion-Chain Signal (CCS).
 
-CCS marks a team as a pre-tournament champion-chain candidate if, in either of the prior two World Cups, it:
+CCS is evaluated as a pre-tournament champion shortlist filter and downgrade signal. It is not presented as a standalone calibrated probability model. The main practical claim is narrower:
 
-- won the tournament; or
-- was eliminated in the knockout stage by that tournament's champion or runner-up.
+> Teams outside the recent champion chain should be downgraded as title picks unless odds, Elo, squad quality, injuries, or draw path provide strong counter-evidence.
 
-The report tests CCS as a champion-candidate filter, not as a standalone champion picker.
+## Read The Report
 
-## Deliverables
+- [Chinese PDF](output/pdf/world_cup_ccs_investment_report_zh.pdf)
+- [English PDF](output/pdf/world_cup_ccs_investment_report_en.pdf)
 
-- `reports/world_cup_ccs_investment_report_en.html` - English executive report.
-- `reports/world_cup_ccs_investment_report_zh.html` - Chinese executive report.
-- `reports/world_cup_ccs_investment_report.html` - English compatibility copy.
-- `reports/pdf/world_cup_ccs_investment_report_en.pdf` - English PDF export.
-- `reports/pdf/world_cup_ccs_investment_report_zh.pdf` - Chinese PDF export.
-- `reports/pdf/world_cup_ccs_investment_report.pdf` - English compatibility PDF.
-- `data/derived/` - reproducible output tables used in the report.
-- `reports/assets/` - generated PNG exhibits.
-- `scripts/build_report.py` - one-command data refresh and report builder.
+## Repository Layout
 
-## Reproduce
+```text
+input/
+  raw/          Original compact input tables used as starting material
+  original/     Original corrected CCS report PDF
 
-```bash
-python3 scripts/build_report.py
+output/
+  pdf/          Final Chinese and English report PDFs
+  figures/      Report exhibits as PNG files
+  tables/       Reader-facing result tables and benchmark summaries
 ```
 
-The script downloads public data from:
+The repository is organized as an input/output package. Intermediate Python scripts, caches, and temporary generation files are intentionally excluded from the public package view.
 
-- Fjelstul World Cup Database CSVs for historical World Cup teams, matches, standings, and tournament metadata.
-- FIFA API ranking schedule and ranking endpoints for pre-tournament FIFA/Coca-Cola Men's World Rankings.
+## Core Finding
 
-The 2026 view uses the June 11, 2026 FIFA ranking as the frozen pre-tournament ranking snapshot. The report does not use 2026 match results to evaluate 2026 outcomes.
+The report separates two definitions:
 
-## Method Notes
+- Pure CCS: a broad champion-chain candidate pool. A team is in the pool if it appears in either of the previous two champion-chain sets.
+- Strict prior-two-participation exclusion: a narrower rule for teams that played both previous World Cups but had no champion/runner-up path contact.
 
-- `West Germany` and `Germany` are treated as one national-team continuity for CCS logic.
-- Early World Cup formats are retained as context, but the primary empirical claim uses the modern knockout era from 1986 to 2022.
-- The random-candidate benchmark preserves each year's actual CCS candidate-pool size and asks how often a random same-size pool would cover at least 9 of 10 modern champions.
-- FIFA ranking comparisons are used as a strong-team baseline and reader-facing sanity check, not as a full predictive model.
-- The favorite-downgrade exhibit is curated from the Top-20 non-CCS audit pool to focus on recognizable strong teams/title-relevant football brands: Argentina, Germany, England, Spain, Portugal, Netherlands, Belgium, Colombia, Croatia, and Uruguay. The broader mechanical audit list is retained in `data/derived/favorite_traps.csv`.
-- The 2026 application separately highlights rank-strong non-CCS title names: Spain, Portugal, Brazil, Germany, and Colombia.
-- The contender-label permutation simulation controls for the simple "CCS just picks famous teams" explanation by preserving CCS counts inside and outside the traditional title-contender set, then randomizing labels within those groups.
-- FIFA rank is retained as an audit field, but the report's main narrative is title-contender recognition plus champion-chain path validation, not a ranking-table model.
+Across the historical backtest, CCS is strongest as:
+
+- a first-layer champion shortlist filter;
+- a downgrade signal for famous non-CCS contenders;
+- a complement to public strength measures such as FIFA ranking, Elo, and market odds.
+
+## Key Output Tables
+
+Selected CSVs in `output/tables/` are meant to be read directly:
+
+- `historical_knockout_summary.csv` - historical pure-CCS champion coverage.
+- `path_exclusion_summary.csv` - strict prior-two-participation exclusion test.
+- `historical_random_benchmark.csv` - same-size random benchmark for pure CCS.
+- `path_exclusion_random_benchmark.csv` - same-size random benchmark for strict exclusion.
+- `strength_inertia_summary.csv` - previous top-four/top-eight/top-16 baselines.
+- `model_incremental_summary.csv` - FIFA, Elo, blended model, and CCS same-size comparison.
+- `model_topk_curve_summary.csv` - Top-K recall comparison.
+- `ccs_rank_compression_summary.csv` - CCS plus FIFA rank-gate compression test.
+- `ccs_2026_watchlist.csv` - 2026 qualified teams with CCS status.
+- `ccs_2026_downgrade_giants.csv` - 2026 high-reputation non-CCS teams highlighted in the report.
+
+## Interpretation Boundary
+
+The random simulations are necessary benchmarks, not investment odds. They show that same-size random pools do not easily reproduce the observed historical pattern, but they do not prove causality and do not penalize the process of historical rule discovery.
+
+The recommended use is therefore:
+
+1. Start with CCS as a candidate filter.
+2. Downgrade non-CCS favorites.
+3. Re-admit or rank teams only with explicit strength evidence such as odds, Elo, squad health, or draw path.

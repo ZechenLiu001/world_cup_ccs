@@ -1,0 +1,12 @@
+# Local generation workspace
+data/
+reports/
+scripts/
+docs/
+requirements.txt
+
+# Temporary/cache files
+tmp/
+__pycache__/
+*.pyc
+.DS_Store

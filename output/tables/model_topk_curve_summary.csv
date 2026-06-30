@@ -1,0 +1,121 @@
+scope,model,label_en,label_zh,k,champion_hits,champions_considered,coverage
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,1,0,8,0.0
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,2,4,8,0.5
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,3,5,8,0.625
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,4,5,8,0.625
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,5,5,8,0.625
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,6,6,8,0.75
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,7,7,8,0.875
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,8,7,8,0.875
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,9,7,8,0.875
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,10,7,8,0.875
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,11,7,8,0.875
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,12,7,8,0.875
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,13,7,8,0.875
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,14,8,8,1.0
+all_1994_2022,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,15,8,8,1.0
+all_1994_2022,elo_rank,Elo rating,Elo,1,1,8,0.125
+all_1994_2022,elo_rank,Elo rating,Elo,2,2,8,0.25
+all_1994_2022,elo_rank,Elo rating,Elo,3,3,8,0.375
+all_1994_2022,elo_rank,Elo rating,Elo,4,4,8,0.5
+all_1994_2022,elo_rank,Elo rating,Elo,5,5,8,0.625
+all_1994_2022,elo_rank,Elo rating,Elo,6,5,8,0.625
+all_1994_2022,elo_rank,Elo rating,Elo,7,7,8,0.875
+all_1994_2022,elo_rank,Elo rating,Elo,8,7,8,0.875
+all_1994_2022,elo_rank,Elo rating,Elo,9,7,8,0.875
+all_1994_2022,elo_rank,Elo rating,Elo,10,7,8,0.875
+all_1994_2022,elo_rank,Elo rating,Elo,11,7,8,0.875
+all_1994_2022,elo_rank,Elo rating,Elo,12,7,8,0.875
+all_1994_2022,elo_rank,Elo rating,Elo,13,7,8,0.875
+all_1994_2022,elo_rank,Elo rating,Elo,14,7,8,0.875
+all_1994_2022,elo_rank,Elo rating,Elo,15,8,8,1.0
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,1,0,8,0.0
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,2,4,8,0.5
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,3,5,8,0.625
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,4,5,8,0.625
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,5,5,8,0.625
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,6,5,8,0.625
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,7,6,8,0.75
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,8,6,8,0.75
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,9,6,8,0.75
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,10,7,8,0.875
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,11,8,8,1.0
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,12,8,8,1.0
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,13,8,8,1.0
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,14,8,8,1.0
+all_1994_2022,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,15,8,8,1.0
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,1,0,8,0.0
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,2,3,8,0.375
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,3,5,8,0.625
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,4,5,8,0.625
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,5,5,8,0.625
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,6,5,8,0.625
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,7,6,8,0.75
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,8,6,8,0.75
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,9,6,8,0.75
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,10,6,8,0.75
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,11,7,8,0.875
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,12,7,8,0.875
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,13,7,8,0.875
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,14,7,8,0.875
+all_1994_2022,fifa_rank,FIFA rank,FIFA 排名,15,8,8,1.0
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,1,0,7,0.0
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,2,4,7,0.5714285714285714
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,3,5,7,0.7142857142857143
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,4,5,7,0.7142857142857143
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,5,5,7,0.7142857142857143
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,6,6,7,0.8571428571428571
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,7,7,7,1.0
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,8,7,7,1.0
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,9,7,7,1.0
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,10,7,7,1.0
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,11,7,7,1.0
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,12,7,7,1.0
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,13,7,7,1.0
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,14,7,7,1.0
+evaluable_ex_france_1998,ccs_filtered_blend,CCS-filtered FIFA/Elo blend,CCS 过滤后 FIFA/Elo 组合,15,7,7,1.0
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,1,1,7,0.14285714285714285
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,2,2,7,0.2857142857142857
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,3,3,7,0.42857142857142855
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,4,4,7,0.5714285714285714
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,5,4,7,0.5714285714285714
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,6,4,7,0.5714285714285714
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,7,6,7,0.8571428571428571
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,8,6,7,0.8571428571428571
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,9,6,7,0.8571428571428571
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,10,6,7,0.8571428571428571
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,11,6,7,0.8571428571428571
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,12,6,7,0.8571428571428571
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,13,6,7,0.8571428571428571
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,14,6,7,0.8571428571428571
+evaluable_ex_france_1998,elo_rank,Elo rating,Elo,15,7,7,1.0
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,1,0,7,0.0
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,2,4,7,0.5714285714285714
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,3,5,7,0.7142857142857143
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,4,5,7,0.7142857142857143
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,5,5,7,0.7142857142857143
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,6,5,7,0.7142857142857143
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,7,6,7,0.8571428571428571
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,8,6,7,0.8571428571428571
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,9,6,7,0.8571428571428571
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,10,6,7,0.8571428571428571
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,11,7,7,1.0
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,12,7,7,1.0
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,13,7,7,1.0
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,14,7,7,1.0
+evaluable_ex_france_1998,fifa_elo_blend,FIFA/Elo blend,FIFA/Elo 组合,15,7,7,1.0
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,1,0,7,0.0
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,2,3,7,0.42857142857142855
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,3,5,7,0.7142857142857143
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,4,5,7,0.7142857142857143
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,5,5,7,0.7142857142857143
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,6,5,7,0.7142857142857143
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,7,6,7,0.8571428571428571
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,8,6,7,0.8571428571428571
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,9,6,7,0.8571428571428571
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,10,6,7,0.8571428571428571
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,11,7,7,1.0
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,12,7,7,1.0
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,13,7,7,1.0
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,14,7,7,1.0
+evaluable_ex_france_1998,fifa_rank,FIFA rank,FIFA 排名,15,7,7,1.0

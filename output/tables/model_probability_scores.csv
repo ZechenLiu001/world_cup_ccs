@@ -1,0 +1,7 @@
+scope,model,label_en,label_zh,champions_considered,avg_champion_probability,log_loss,brier_score
+all_1994_2022,fifa_implied_prob,FIFA implied probability,FIFA 隐含概率,8,0.08205941841848598,2.771658973143338,0.030901254976133517
+all_1994_2022,elo_implied_prob,Elo implied probability,Elo 隐含概率,8,0.06417371968563326,2.8307748534586317,0.029819868757747656
+all_1994_2022,fifa_elo_implied_prob,FIFA/Elo implied probability,FIFA/Elo 隐含概率,8,0.07311656905205963,2.7277599416036296,0.029984353652663227
+evaluable_ex_france_1998,fifa_implied_prob,FIFA implied probability,FIFA 隐含概率,7,0.09159149151977419,2.570806888601204,0.03048008621591607
+evaluable_ex_france_1998,elo_implied_prob,Elo implied probability,Elo 隐含概率,7,0.0661209847986174,2.8087521878492354,0.029882287596523116
+evaluable_ex_france_1998,fifa_elo_implied_prob,FIFA/Elo implied probability,FIFA/Elo 隐含概率,7,0.0788562381591958,2.629854019681717,0.02980267195388824

@@ -1,5 +1,0 @@
-pandas
-numpy
-Pillow
-matplotlib
-beautifulsoup4

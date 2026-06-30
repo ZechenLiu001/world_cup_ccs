@@ -1,0 +1,5 @@
+threshold,candidate_count,selected_teams
+10,6,Argentina;France;England;Morocco;Netherlands;Belgium
+15,7,Argentina;France;England;Morocco;Netherlands;Belgium;Croatia
+20,8,Argentina;France;England;Morocco;Netherlands;Belgium;Croatia;Uruguay
+25,8,Argentina;France;England;Morocco;Netherlands;Belgium;Croatia;Uruguay

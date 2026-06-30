@@ -1,0 +1,9 @@
+scope,model,label_en,label_zh,champion_hits,champions_considered,coverage,avg_pool_size,avg_champion_model_rank,avg_champion_fifa_elo_prob,missed_champions
+all_1994_2022,elo_rank,"Elo rating, same-size pool",Elo 同规模池,7,8,0.875,9.875,5.5,0.07311656905205963,2002 Brazil
+all_1994_2022,fifa_elo_blend,"FIFA/Elo implied probability, same-size pool",FIFA/Elo 隐含概率同规模池,7,8,0.875,9.875,4.875,0.07311656905205963,2006 Italy
+all_1994_2022,fifa_rank,"FIFA rank, same-size pool",FIFA 排名同规模池,6,8,0.75,9.875,5.625,0.07311656905205963,1998 France;2006 Italy
+all_1994_2022,pure_ccs,Pure CCS,纯 CCS,7,8,0.875,9.875,4.75,0.07311656905205963,1998 France
+evaluable_ex_france_1998,elo_rank,"Elo rating, same-size pool",Elo 同规模池,6,7,0.8571428571428571,9.714285714285714,5.571428571428571,0.0788562381591958,2002 Brazil
+evaluable_ex_france_1998,fifa_elo_blend,"FIFA/Elo implied probability, same-size pool",FIFA/Elo 隐含概率同规模池,6,7,0.8571428571428571,9.714285714285714,4.142857142857143,0.0788562381591958,2006 Italy
+evaluable_ex_france_1998,fifa_rank,"FIFA rank, same-size pool",FIFA 排名同规模池,6,7,0.8571428571428571,9.714285714285714,4.285714285714286,0.0788562381591958,2006 Italy
+evaluable_ex_france_1998,pure_ccs,Pure CCS,纯 CCS,7,7,1.0,9.714285714285714,3.4285714285714284,0.0788562381591958,
