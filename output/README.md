@@ -4,8 +4,8 @@ This folder contains the final reader-facing deliverables.
 
 ## PDF
 
-- `pdf/world_cup_ccs_investment_report_zh.pdf` - Chinese report.
-- `pdf/world_cup_ccs_investment_report_en.pdf` - English report.
+- `pdf/world_cup_ccs_report_zh.pdf` - Chinese report.
+- `pdf/world_cup_ccs_report_en.pdf` - English report.
 
 ## Figures
 

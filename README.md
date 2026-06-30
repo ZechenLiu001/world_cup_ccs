@@ -8,8 +8,8 @@ CCS is evaluated as a pre-tournament champion shortlist filter and downgrade sig
 
 ## Read The Report
 
-- [Chinese PDF](output/pdf/world_cup_ccs_investment_report_zh.pdf)
-- [English PDF](output/pdf/world_cup_ccs_investment_report_en.pdf)
+- [Chinese PDF](output/pdf/world_cup_ccs_report_zh.pdf)
+- [English PDF](output/pdf/world_cup_ccs_report_en.pdf)
 
 ## Repository Layout
 
@@ -56,7 +56,7 @@ Selected CSVs in `output/tables/` are meant to be read directly:
 
 ## Interpretation Boundary
 
-The random simulations are necessary benchmarks, not investment odds. They show that same-size random pools do not easily reproduce the observed historical pattern, but they do not prove causality and do not penalize the process of historical rule discovery.
+The random simulations are necessary benchmarks, not forecast odds. They show that same-size random pools do not easily reproduce the observed historical pattern, but they do not prove causality and do not penalize the process of historical rule discovery.
 
 The recommended use is therefore:
 
