@@ -51,6 +51,7 @@ Selected CSVs in `output/tables/` are meant to be read directly:
 - `model_incremental_summary.csv` - FIFA, Elo, blended model, and CCS same-size comparison.
 - `model_topk_curve_summary.csv` - Top-K recall comparison.
 - `ccs_rank_compression_summary.csv` - CCS plus FIFA rank-gate compression test.
+- `ccs_top15_stage_remaining_summary.csv` - CCS plus FIFA Top-15 candidates remaining at field, R16, QF, SF, finalist, and champion stages.
 - `ccs_2026_watchlist.csv` - 2026 qualified teams with CCS status.
 - `ccs_2026_downgrade_giants.csv` - 2026 high-reputation non-CCS teams highlighted in the report.
 

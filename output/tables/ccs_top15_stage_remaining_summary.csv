@@ -1,0 +1,13 @@
+scope,stage_order,stage,label_en,label_zh,years,avg_stage_total,avg_remaining_candidates,avg_stage_share
+all_1994_2022,1,field,Pre-tournament field,赛前参赛队,8,31.0,7.375,0.23697916666666669
+all_1994_2022,2,r16,Round of 16,16强,8,16.0,5.625,0.3515625
+all_1994_2022,3,qf,Quarter-finals,8强,8,8.0,3.875,0.484375
+all_1994_2022,4,sf,Semi-finals,4强,8,4.0,2.0,0.5
+all_1994_2022,5,finalists,Finalists,决赛2队,8,2.0,1.375,0.6875
+all_1994_2022,6,champion,Champion,冠军,8,1.0,0.875,0.875
+evaluable_ex_france_1998,1,field,Pre-tournament field,赛前参赛队,7,30.857142857142858,7.285714285714286,0.23511904761904764
+evaluable_ex_france_1998,2,r16,Round of 16,16强,7,16.0,5.571428571428571,0.3482142857142857
+evaluable_ex_france_1998,3,qf,Quarter-finals,8强,7,8.0,3.857142857142857,0.48214285714285715
+evaluable_ex_france_1998,4,sf,Semi-finals,4强,7,4.0,2.142857142857143,0.5357142857142857
+evaluable_ex_france_1998,5,finalists,Finalists,决赛2队,7,2.0,1.4285714285714286,0.7142857142857143
+evaluable_ex_france_1998,6,champion,Champion,冠军,7,1.0,1.0,1.0
